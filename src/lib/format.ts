@@ -67,3 +67,69 @@ export function truncate(text: string | undefined, max = 40): string {
   if (!text) return ''
   return text.length > max ? `${text.slice(0, max)}…` : text
 }
+
+const CYCLE_LABELS: Record<string, string> = {
+  month: '月',
+  quarter: '季',
+  half_year: '半年',
+  year: '年',
+  two_years: '2年',
+  three_years: '3年',
+  four_years: '4年',
+  five_years: '5年',
+}
+
+export function formatPrice(
+  price?: string | number,
+  currency = '¥',
+  cycle?: string
+): string {
+  if (price === undefined || price === null || price === '') return '-'
+  const n = Number(price)
+  if (Number.isNaN(n)) return '-'
+  if (n <= 0) return '免费'
+  const unit = cycle ? CYCLE_LABELS[cycle] || cycle : ''
+  return `${currency || '¥'}${price}${unit ? `/${unit}` : ''}`
+}
+
+export type ExpiryTone = 'muted' | 'warning' | 'destructive'
+
+export function formatExpiry(dateStr?: string): {
+  text: string
+  tone: ExpiryTone
+} {
+  if (!dateStr) return { text: '永久', tone: 'muted' }
+  const target = new Date(`${dateStr}T00:00:00`)
+  if (Number.isNaN(target.getTime())) return { text: dateStr, tone: 'muted' }
+  const days = Math.ceil((target.getTime() - Date.now()) / 86400000)
+  if (days < 0) return { text: `已过期 ${-days} 天`, tone: 'destructive' }
+  if (days <= 30) return { text: `剩余 ${days} 天`, tone: 'warning' }
+  return { text: `剩余 ${days} 天`, tone: 'muted' }
+}
+
+export function trafficLimitBytes(limit?: string | number): number | null {
+  const n = Number(limit)
+  if (!limit || Number.isNaN(n) || n <= 0) return null
+  return n * 1024 ** 3
+}
+
+export function trafficUsedBytes(server: {
+  net_rx_monthly?: number
+  net_tx_monthly?: number
+  traffic_calc_type?: string
+}): number {
+  const rx = server.net_rx_monthly ?? 0
+  const tx = server.net_tx_monthly ?? 0
+  switch (server.traffic_calc_type) {
+    case 'up':
+      return tx
+    case 'down':
+      return rx
+    case 'max':
+      return Math.max(rx, tx)
+    case 'min':
+      return Math.min(rx, tx)
+    default:
+      return rx + tx
+  }
+}

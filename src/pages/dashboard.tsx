@@ -16,9 +16,8 @@ import { isOnline } from '@/lib/format'
 export function Dashboard() {
   const { config } = useConfig()
   const { mode, setMode } = useTheme(config?.preferred_theme)
-  const { servers, regionStats, loading, error, connected } = useServers(
-    config?.frontend_ws_timeout_minutes ?? 0
-  )
+  const { servers, sysConfig, regionStats, loading, error, connected } =
+    useServers(config?.frontend_ws_timeout_minutes ?? 0)
   const [region, setRegion] = React.useState('all')
 
   const sorted = React.useMemo(
@@ -135,7 +134,13 @@ export function Dashboard() {
               <Skeleton key={i} className="h-64 rounded-xl" />
             ))
           : filtered.map((server) => (
-              <ServerCard key={server.id} server={server} />
+              <ServerCard
+                key={server.id}
+                server={server}
+                showPrice={sysConfig?.show_price !== false}
+                showExpire={sysConfig?.show_expire !== false}
+                showTraffic={sysConfig?.show_tf !== false}
+              />
             ))}
       </div>
 

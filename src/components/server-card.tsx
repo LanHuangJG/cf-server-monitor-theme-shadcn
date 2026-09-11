@@ -6,9 +6,14 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import {
+  formatBytes,
+  formatExpiry,
+  formatPrice,
   formatSpeed,
   formatUptime,
   isOnline,
+  trafficLimitBytes,
+  trafficUsedBytes,
   usedPercent,
 } from '@/lib/format'
 import type { Server } from '@/lib/types'
@@ -43,11 +48,40 @@ function Flag({ region }: { region?: string }) {
   )
 }
 
-export function ServerCard({ server }: { server: Server }) {
+const EXPIRY_TONE: Record<string, string> = {
+  muted: 'text-muted-foreground',
+  warning: 'text-warning',
+  destructive: 'text-destructive',
+}
+
+export function ServerCard({
+  server,
+  showPrice = true,
+  showExpire = true,
+  showTraffic = true,
+}: {
+  server: Server
+  showPrice?: boolean
+  showExpire?: boolean
+  showTraffic?: boolean
+}) {
   const online = isOnline(server)
   const cpu = server.cpu ?? 0
   const ramPercent = usedPercent(server.ram_used, server.ram_total)
   const diskPercent = usedPercent(server.disk_used, server.disk_total)
+
+  const limitBytes = trafficLimitBytes(server.traffic_limit)
+  const usedBytes = trafficUsedBytes(server)
+  const trafficPercent = limitBytes
+    ? Math.min(100, (usedBytes / limitBytes) * 100)
+    : 0
+  const expiry = formatExpiry(server.expire_date)
+  const tags = (server.tags || '')
+    .split(',')
+    .map((t) => t.trim())
+    .filter(Boolean)
+
+  const showBilling = showPrice || showExpire
 
   return (
     <Link to={`/server/${server.id}`} className="group block">
@@ -77,11 +111,7 @@ export function ServerCard({ server }: { server: Server }) {
         </CardHeader>
 
         <CardContent className="space-y-3 px-5">
-          <MetricBar
-            label="CPU"
-            percent={cpu}
-            value={`${cpu.toFixed(1)}%`}
-          />
+          <MetricBar label="CPU" percent={cpu} value={`${cpu.toFixed(1)}%`} />
           <MetricBar
             label="内存"
             percent={ramPercent}
@@ -92,6 +122,14 @@ export function ServerCard({ server }: { server: Server }) {
             percent={diskPercent}
             value={`${diskPercent.toFixed(0)}%`}
           />
+
+          {showTraffic && limitBytes && (
+            <MetricBar
+              label="流量"
+              percent={trafficPercent}
+              value={`${formatBytes(usedBytes)} / ${formatBytes(limitBytes)}`}
+            />
+          )}
 
           <Separator />
 
@@ -121,6 +159,33 @@ export function ServerCard({ server }: { server: Server }) {
               </span>
             </div>
           </div>
+
+          {showBilling && (
+            <div className="flex items-center justify-between text-[11px]">
+              <span className="text-muted-foreground">
+                {showPrice
+                  ? formatPrice(
+                      server.price,
+                      server.currency,
+                      server.billing_cycle
+                    )
+                  : ''}
+              </span>
+              <span className={cn('font-medium', EXPIRY_TONE[expiry.tone])}>
+                {showExpire ? expiry.text : ''}
+              </span>
+            </div>
+          )}
+
+          {tags.length > 0 && (
+            <div className="flex flex-wrap gap-1">
+              {tags.map((tag) => (
+                <Badge key={tag} variant="secondary" className="text-[10px]">
+                  {tag}
+                </Badge>
+              ))}
+            </div>
+          )}
 
           <div className="truncate text-[11px] text-muted-foreground">
             {server.os || '-'}

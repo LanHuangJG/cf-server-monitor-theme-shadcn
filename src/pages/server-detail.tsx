@@ -1,4 +1,11 @@
-import { ArrowLeft, Cpu, HardDrive, MemoryStick, Settings } from 'lucide-react'
+import {
+  ArrowLeft,
+  BadgeDollarSign,
+  Cpu,
+  HardDrive,
+  MemoryStick,
+  Settings,
+} from 'lucide-react'
 import { Link, useParams } from 'react-router-dom'
 
 import { DetailSkeleton } from '@/components/detail-skeleton'
@@ -15,11 +22,15 @@ import { useServerDetail } from '@/hooks/use-server-detail'
 import { useTheme } from '@/hooks/use-theme'
 import {
   formatBytes,
+  formatExpiry,
   formatMB,
+  formatPrice,
   formatSpeed,
   formatUptime,
   isOnline,
   timeAgo,
+  trafficLimitBytes,
+  trafficUsedBytes,
   usedPercent,
 } from '@/lib/format'
 
@@ -62,6 +73,17 @@ export function ServerDetail() {
   const ramPercent = usedPercent(server.ram_used, server.ram_total)
   const diskPercent = usedPercent(server.disk_used, server.disk_total)
   const swapPercent = usedPercent(server.swap_used, server.swap_total)
+
+  const limitBytes = trafficLimitBytes(server.traffic_limit)
+  const usedBytes = trafficUsedBytes(server)
+  const trafficPercent = limitBytes
+    ? Math.min(100, (usedBytes / limitBytes) * 100)
+    : 0
+  const expiry = formatExpiry(server.expire_date)
+  const tags = (server.tags || '')
+    .split(',')
+    .map((t) => t.trim())
+    .filter(Boolean)
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
@@ -148,6 +170,67 @@ export function ServerDetail() {
             </CardContent>
           </Card>
         </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+              <BadgeDollarSign className="size-4" /> 计费与流量
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+              <Stat
+                label="价格"
+                value={formatPrice(
+                  server.price,
+                  server.currency,
+                  server.billing_cycle
+                )}
+              />
+              <Stat
+                label="到期"
+                value={
+                  expiry.tone === 'destructive'
+                    ? expiry.text
+                    : expiry.text === '永久'
+                      ? server.expire_date || '永久'
+                      : `${server.expire_date}（${expiry.text}）`
+                }
+              />
+              <Stat
+                label="自动续费"
+                value={String(server.auto_renewal) === '1' ? '是' : '否'}
+              />
+              <Stat
+                label="本月流量"
+                value={
+                  limitBytes
+                    ? `${formatBytes(usedBytes)} / ${formatBytes(limitBytes)}`
+                    : '无限'
+                }
+              />
+            </div>
+            {limitBytes && (
+              <>
+                <Separator />
+                <MetricBar
+                  label="流量使用"
+                  percent={trafficPercent}
+                  value={`${trafficPercent.toFixed(1)}%`}
+                />
+              </>
+            )}
+            {tags.length > 0 && (
+              <div className="flex flex-wrap gap-1 pt-1">
+                {tags.map((tag) => (
+                  <Badge key={tag} variant="secondary">
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         <Card>
           <CardHeader>
