@@ -2,6 +2,7 @@ import { ArrowDown, ArrowUp, Server } from 'lucide-react'
 
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
 import { formatBytes, formatSpeed } from '@/lib/format'
 import { cn } from '@/lib/utils'
 
@@ -13,6 +14,7 @@ export function SummaryCards({
   netRx,
   netTx,
   connection,
+  loading,
 }: {
   total: number
   online: number
@@ -21,7 +23,27 @@ export function SummaryCards({
   netRx: number
   netTx: number
   connection: boolean
+  loading?: boolean
 }) {
+  if (loading) {
+    return (
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <Card key={i}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="size-4 rounded-sm" />
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <Skeleton className="h-7 w-24" />
+              <Skeleton className="h-3 w-16" />
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    )
+  }
+
   const offline = Math.max(0, total - online)
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -38,9 +60,7 @@ export function SummaryCards({
               {online}
               <span className="text-muted-foreground"> / {total}</span>
             </span>
-            {offline > 0 && (
-              <Badge variant="destructive">{offline} 离线</Badge>
-            )}
+            {offline > 0 && <Badge variant="destructive">{offline} 离线</Badge>}
           </div>
           <p className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
             <span

@@ -67,7 +67,11 @@ export function Dashboard() {
             </svg>
           </div>
           <div>
-            <h1 className="text-lg font-semibold leading-tight">{total}</h1>
+            {config ? (
+              <h1 className="text-lg font-semibold leading-tight">{total}</h1>
+            ) : (
+              <Skeleton className="h-5 w-40" />
+            )}
             <p className="text-xs text-muted-foreground">
               由 CF-Server-Monitor 驱动
             </p>
@@ -84,9 +88,18 @@ export function Dashboard() {
         netRx={summary.netRx}
         netTx={summary.netTx}
         connection={connected}
+        loading={loading}
       />
 
-      {regions.length > 1 && (
+      {loading && regions.length === 0 && (
+        <div className="mt-6 flex flex-wrap gap-2">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-8 w-16 rounded-md" />
+          ))}
+        </div>
+      )}
+
+      {!loading && regions.length > 1 && (
         <div className="mt-6 flex flex-wrap gap-2">
           <Button
             variant={region === 'all' ? 'secondary' : 'ghost'}

@@ -1,19 +1,12 @@
 import { lazy, Suspense } from 'react'
 import { HashRouter, Route, Routes } from 'react-router-dom'
 
+import { DetailSkeleton } from '@/components/detail-skeleton'
 import { Dashboard } from '@/pages/dashboard'
 
 const ServerDetail = lazy(() =>
   import('@/pages/server-detail').then((m) => ({ default: m.ServerDetail }))
 )
-
-function DetailFallback() {
-  return (
-    <div className="flex min-h-svh items-center justify-center text-sm text-muted-foreground">
-      加载中…
-    </div>
-  )
-}
 
 export default function App() {
   return (
@@ -24,7 +17,7 @@ export default function App() {
           <Route
             path="/server/:id"
             element={
-              <Suspense fallback={<DetailFallback />}>
+              <Suspense fallback={<DetailSkeleton />}>
                 <ServerDetail />
               </Suspense>
             }
