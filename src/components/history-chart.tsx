@@ -3,6 +3,8 @@ import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts'
 
 import {
   ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
   ChartTooltip,
   ChartTooltipContent,
   type ChartConfig,
@@ -247,6 +249,9 @@ export function HistoryChart({
                   strokeWidth={2}
                   isAnimationActive={false}
                 />
+              )}
+              {(isNetwork || isLatency) && (
+                <ChartLegend content={<ChartLegendContent />} />
               )}
             </AreaChart>
           </ChartContainer>
