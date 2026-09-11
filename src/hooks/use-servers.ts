@@ -27,6 +27,7 @@ export function useServers(wsTimeoutMinutes = 0) {
 
   const serversRef = React.useRef<Server[]>([])
   serversRef.current = servers
+  const connectRef = React.useRef<() => void>(() => {})
 
   const load = React.useCallback(async () => {
     const data = await fetchServers()
@@ -77,9 +78,16 @@ export function useServers(wsTimeoutMinutes = 0) {
 
     const connect = () => {
       if (document.hidden) return
+      if (
+        ws &&
+        (ws.readyState === WebSocket.OPEN ||
+          ws.readyState === WebSocket.CONNECTING)
+      ) {
+        return
+      }
       const ids = serversRef.current.map((s) => s.id)
       if (ids.length === 0) {
-        reconnectTimer = setTimeout(connect, 5000)
+        reconnectTimer = setTimeout(connect, 1000)
         return
       }
       closedByUs = false
@@ -128,6 +136,7 @@ export function useServers(wsTimeoutMinutes = 0) {
         }
       }
     }
+    connectRef.current = connect
 
     const onVisibility = () => {
       if (document.hidden) {
@@ -146,6 +155,11 @@ export function useServers(wsTimeoutMinutes = 0) {
       cleanupWs()
     }
   }, [load, wsTimeoutMinutes])
+
+  // 列表就绪后立即建立实时连接（不必等空列表的重试）
+  React.useEffect(() => {
+    if (servers.length > 0) connectRef.current()
+  }, [servers.length])
 
   return {
     servers,
