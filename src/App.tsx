@@ -8,6 +8,7 @@ import {
 } from 'react-router-dom'
 
 import { DetailSkeleton } from '@/components/detail-skeleton'
+import { AppProvider } from '@/hooks/use-app'
 import { Dashboard } from '@/pages/dashboard'
 
 const ServerDetail = lazy(() =>
@@ -57,21 +58,23 @@ function ScrollManager() {
 
 export default function App() {
   return (
-    <HashRouter>
-      <ScrollManager />
-      <div className="min-h-svh bg-background">
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route
-            path="/server/:id"
-            element={
-              <Suspense fallback={<DetailSkeleton />}>
-                <ServerDetail />
-              </Suspense>
-            }
-          />
-        </Routes>
-      </div>
-    </HashRouter>
+    <AppProvider>
+      <HashRouter>
+        <ScrollManager />
+        <div className="min-h-svh bg-background">
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route
+              path="/server/:id"
+              element={
+                <Suspense fallback={<DetailSkeleton />}>
+                  <ServerDetail />
+                </Suspense>
+              }
+            />
+          </Routes>
+        </div>
+      </HashRouter>
+    </AppProvider>
   )
 }

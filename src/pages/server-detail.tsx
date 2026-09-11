@@ -12,16 +12,14 @@ import { DetailSkeleton } from '@/components/detail-skeleton'
 import { Footer } from '@/components/footer'
 import { HistoryChart } from '@/components/history-chart'
 import { MetricBar } from '@/components/metric-bar'
-import { ThemeSettings } from '@/components/theme-settings'
+import { SettingsSheet } from '@/components/settings-sheet'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-import { useConfig } from '@/hooks/use-config'
-import { useAppearance } from '@/hooks/use-appearance'
+import { useApp } from '@/hooks/use-app'
 import { useServerDetail } from '@/hooks/use-server-detail'
-import { useTheme } from '@/hooks/use-theme'
 import {
   formatBytes,
   formatExpiry,
@@ -48,9 +46,7 @@ function Stat({ label, value }: { label: string; value: string }) {
 
 export function ServerDetail() {
   const { id } = useParams<{ id: string }>()
-  const { config } = useConfig()
-  useAppearance(config)
-  const { mode, setMode } = useTheme(config?.preferred_theme)
+  const { config, prefs, setPref } = useApp()
   const { server, history, hours, setHours, loading, error } = useServerDetail(
     id,
     1
@@ -122,13 +118,16 @@ export function ServerDetail() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          {config && <ThemeSettings config={config} />}
+          <SettingsSheet />
           <Button variant="outline" size="icon" asChild>
             <a href="/admin#admin" aria-label="管理后台" title="管理后台">
               <Settings className="size-4" />
             </a>
           </Button>
-          <ThemeToggle mode={mode} setMode={setMode} />
+          <ThemeToggle
+            mode={prefs.mode}
+            setMode={(m) => setPref('mode', m)}
+          />
         </div>
       </header>
 

@@ -5,42 +5,23 @@ import { Footer } from '@/components/footer'
 import { ServerCard } from '@/components/server-card'
 import { ServerTable } from '@/components/server-table'
 import { SummaryBar } from '@/components/summary-bar'
-import { ThemeSettings } from '@/components/theme-settings'
+import { SettingsSheet } from '@/components/settings-sheet'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { ViewSwitcher, type ViewMode } from '@/components/view-switcher'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { useConfig } from '@/hooks/use-config'
-import { useAppearance } from '@/hooks/use-appearance'
+import { useApp } from '@/hooks/use-app'
 import { useServers } from '@/hooks/use-servers'
-import { useTheme } from '@/hooks/use-theme'
 import { isOnline } from '@/lib/format'
 
 export function Dashboard() {
-  const { config } = useConfig()
-  useAppearance(config)
-  const { mode, setMode } = useTheme(config?.preferred_theme)
+  const { config, prefs, setPref } = useApp()
   const { servers, sysConfig, regionStats, loading, error, connection } =
     useServers(config?.frontend_ws_timeout_minutes ?? 0)
   const [region, setRegion] = React.useState('all')
-  const [view, setView] = React.useState<ViewMode>('grid')
-
-  React.useEffect(() => {
-    const saved = localStorage.getItem('cfsm-view')
-    if (saved === 'grid' || saved === 'table' || saved === 'ring') {
-      setView(saved)
-    } else if (config?.display_mode === 'table') {
-      setView('table')
-    } else if (config?.display_mode === 'ring') {
-      setView('ring')
-    }
-  }, [config?.display_mode])
-
-  const changeView = React.useCallback((next: ViewMode) => {
-    localStorage.setItem('cfsm-view', next)
-    setView(next)
-  }, [])
+  const view = prefs.view
+  const changeView = (next: ViewMode) => setPref('view', next)
 
   const sorted = React.useMemo(
     () =>
@@ -103,13 +84,16 @@ export function Dashboard() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          {config && <ThemeSettings config={config} />}
+          <SettingsSheet />
           <Button variant="outline" size="icon" asChild>
             <a href="/admin#admin" aria-label="管理后台" title="管理后台">
               <Settings className="size-4" />
             </a>
           </Button>
-          <ThemeToggle mode={mode} setMode={setMode} />
+          <ThemeToggle
+            mode={prefs.mode}
+            setMode={(m) => setPref('mode', m)}
+          />
         </div>
       </header>
 

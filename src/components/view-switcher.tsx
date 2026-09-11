@@ -1,8 +1,9 @@
 import { CircleDashed, LayoutGrid, Table2 } from 'lucide-react'
 
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import type { ViewMode } from '@/lib/preferences'
 
-export type ViewMode = 'grid' | 'table' | 'ring'
+export type { ViewMode }
 
 const VIEWS: { value: ViewMode; label: string; icon: typeof LayoutGrid }[] = [
   { value: 'grid', label: '卡片', icon: LayoutGrid },

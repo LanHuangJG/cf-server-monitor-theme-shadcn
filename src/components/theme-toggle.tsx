@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import type { ThemeMode } from '@/hooks/use-theme'
+import type { ThemeMode } from '@/lib/preferences'
 
 const OPTIONS: { value: ThemeMode; label: string; icon: typeof Sun }[] = [
   { value: 'light', label: '浅色', icon: Sun },
