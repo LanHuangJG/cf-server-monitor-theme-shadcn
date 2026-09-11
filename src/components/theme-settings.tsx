@@ -24,6 +24,7 @@ const ACCENTS: { value: string; label: string; color: string }[] = [
 
 export function ThemeSettings({ config }: { config: ApiConfig }) {
   const options = (config.theme_options || {}) as Record<string, unknown>
+  const authorized = config.authorization
   const [accent, setAccent] = React.useState<string>(
     typeof options.accent === 'string' ? options.accent : 'default'
   )
@@ -34,11 +35,30 @@ export function ThemeSettings({ config }: { config: ApiConfig }) {
     typeof options.bg === 'string' ? options.bg : ''
   )
   const [saving, setSaving] = React.useState(false)
-  const [error, setError] = React.useState<string | null>(null)
+  const [message, setMessage] = React.useState<string | null>(null)
+
+  // 实时预览（不落库）
+  React.useEffect(() => {
+    const root = document.documentElement
+    if (accent && accent !== 'default') root.dataset.accent = accent
+    else delete root.dataset.accent
+
+    root.style.setProperty('--card-opacity', String(opacity / 100))
+    if (opacity < 100) root.dataset.glass = 'true'
+    else delete root.dataset.glass
+
+    const url = bg.trim()
+    if (url) root.style.setProperty('--theme-bg-image', `url("${url}")`)
+    else root.style.removeProperty('--theme-bg-image')
+  }, [accent, opacity, bg])
 
   const onSave = async () => {
+    if (!authorized) {
+      setMessage('请先登录后台（/admin）再保存')
+      return
+    }
     setSaving(true)
-    setError(null)
+    setMessage(null)
     try {
       await saveThemeOptions({
         ...options,
@@ -48,7 +68,7 @@ export function ThemeSettings({ config }: { config: ApiConfig }) {
       })
       window.location.reload()
     } catch (err) {
-      setError((err as Error).message)
+      setMessage((err as Error).message)
       setSaving(false)
     }
   }
@@ -77,8 +97,7 @@ export function ThemeSettings({ config }: { config: ApiConfig }) {
                 )}
                 style={{
                   background:
-                    item.color ||
-                    'linear-gradient(135deg,#f5f5f5,#737373)',
+                    item.color || 'linear-gradient(135deg,#f5f5f5,#737373)',
                 }}
               >
                 {accent === item.value && (
@@ -118,7 +137,12 @@ export function ThemeSettings({ config }: { config: ApiConfig }) {
           </p>
         </div>
 
-        {error && <p className="text-xs text-destructive">{error}</p>}
+        {message && <p className="text-xs text-destructive">{message}</p>}
+        {!authorized && !message && (
+          <p className="text-xs text-muted-foreground">
+            未登录，仅供预览；保存需先登录后台
+          </p>
+        )}
 
         <div className="flex justify-end gap-2">
           <Button
@@ -128,6 +152,7 @@ export function ThemeSettings({ config }: { config: ApiConfig }) {
               setAccent('default')
               setOpacity(100)
               setBg('')
+              setMessage(null)
             }}
           >
             <RotateCcw className="size-4" />

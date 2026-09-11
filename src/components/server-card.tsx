@@ -8,6 +8,7 @@ import { Separator } from '@/components/ui/separator'
 import {
   formatBytes,
   formatExpiry,
+  formatMB,
   formatPrice,
   formatSpeed,
   formatUptime,
@@ -125,14 +126,14 @@ export function ServerCard({
         <CardContent className="space-y-3 px-5">
           <MetricBar label="CPU" percent={cpu} value={`${cpu.toFixed(1)}%`} />
           <MetricBar
-            label="内存"
+            label={`内存 ${ramPercent.toFixed(0)}%`}
             percent={ramPercent}
-            value={`${ramPercent.toFixed(0)}%`}
+            value={`${formatMB(server.ram_used)} / ${formatMB(server.ram_total)}`}
           />
           <MetricBar
-            label="磁盘"
+            label={`磁盘 ${diskPercent.toFixed(0)}%`}
             percent={diskPercent}
-            value={`${diskPercent.toFixed(0)}%`}
+            value={`${formatMB(server.disk_used)} / ${formatMB(server.disk_total)}`}
           />
 
           {showTraffic && limitBytes && (

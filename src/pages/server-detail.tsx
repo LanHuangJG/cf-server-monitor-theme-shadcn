@@ -114,7 +114,7 @@ export function ServerDetail() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          {config?.authorization && <ThemeSettings config={config} />}
+          {config && <ThemeSettings config={config} />}
           <Button variant="outline" size="icon" asChild>
             <a href="/admin#admin" aria-label="管理后台" title="管理后台">
               <Settings className="size-4" />
