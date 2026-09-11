@@ -4,7 +4,7 @@ A **React + shadcn/ui** theme for [CF-Server-Monitor](https://github.com/huilang
 
 CF 探针（CF-Server-Monitor）的 **React + shadcn/ui** 主题。目前社区主题多为 Vue 3 / reka-ui，这是少见的 React 实现。
 
-> 状态：🚧 开发中（scaffold）。首个可用版本发布前请不要用于生产。
+> 状态：MVP 可用（列表 / 详情 / WebSocket 实时 / 历史图表），持续完善中。
 
 ## ✨ 计划特性
 
