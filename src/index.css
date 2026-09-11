@@ -103,12 +103,26 @@
   }
   body {
     @apply bg-background text-foreground antialiased;
-    background-image: radial-gradient(
-      900px 380px at 50% -140px,
-      color-mix(in oklab, var(--primary) 12%, transparent),
-      transparent
+    background-image: var(
+      --theme-bg-image,
+      radial-gradient(
+        900px 380px at 50% -140px,
+        color-mix(in oklab, var(--primary) 12%, transparent),
+        transparent
+      )
     );
     background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
     background-attachment: fixed;
+  }
+  /* 卡片半透明 + 毛玻璃；有背景图时呈现 glassmorphism */
+  [data-slot="card"] {
+    background-color: color-mix(in oklab, var(--card) 80%, transparent);
+    backdrop-filter: blur(14px) saturate(1.15);
+  }
+  html.no-glass [data-slot="card"] {
+    background-color: var(--card);
+    backdrop-filter: none;
   }
 }

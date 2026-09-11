@@ -145,6 +145,14 @@ export interface HistoryPoint {
   load_avg?: string
   region?: string
   kernel_version?: string
+  ping_ct?: number | boolean
+  ping_cu?: number | boolean
+  ping_cm?: number | boolean
+  ping_bd?: number | boolean
+  loss_ct?: number | boolean
+  loss_cu?: number | boolean
+  loss_cm?: number | boolean
+  loss_bd?: number | boolean
 }
 
 export interface ApiConfig {

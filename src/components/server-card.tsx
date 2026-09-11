@@ -59,11 +59,15 @@ export function ServerCard({
   showPrice = true,
   showExpire = true,
   showTraffic = true,
+  showThreeNet = false,
+  netNames = { ct: '电信', cu: '联通', cm: '移动', bd: 'BGP' },
 }: {
   server: Server
   showPrice?: boolean
   showExpire?: boolean
   showTraffic?: boolean
+  showThreeNet?: boolean
+  netNames?: { ct: string; cu: string; cm: string; bd: string }
 }) {
   const online = isOnline(server)
   const cpu = server.cpu ?? 0
@@ -80,6 +84,14 @@ export function ServerCard({
     .split(',')
     .map((t) => t.trim())
     .filter(Boolean)
+
+  const nets = [
+    { key: 'ct', label: netNames.ct, value: server.ping_ct },
+    { key: 'cu', label: netNames.cu, value: server.ping_cu },
+    { key: 'cm', label: netNames.cm, value: server.ping_cm },
+    { key: 'bd', label: netNames.bd, value: server.ping_bd },
+  ]
+  const hasPing = nets.some((n) => typeof n.value === 'number')
 
   const showBilling = showPrice || showExpire
 
@@ -129,6 +141,24 @@ export function ServerCard({
               percent={trafficPercent}
               value={`${formatBytes(usedBytes)} / ${formatBytes(limitBytes)}`}
             />
+          )}
+
+          {showThreeNet && hasPing && (
+            <div className="grid grid-cols-4 gap-1">
+              {nets.map((n) => (
+                <div
+                  key={n.key}
+                  className="rounded-md bg-muted/50 px-1 py-1 text-center"
+                >
+                  <div className="text-[10px] text-muted-foreground">
+                    {n.label}
+                  </div>
+                  <div className="text-xs font-medium tabular-nums">
+                    {typeof n.value === 'number' ? n.value : '—'}
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
 
           <Separator />

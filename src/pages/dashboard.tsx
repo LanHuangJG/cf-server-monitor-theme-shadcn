@@ -9,12 +9,14 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useConfig } from '@/hooks/use-config'
+import { useAppearance } from '@/hooks/use-appearance'
 import { useServers } from '@/hooks/use-servers'
 import { useTheme } from '@/hooks/use-theme'
 import { isOnline } from '@/lib/format'
 
 export function Dashboard() {
   const { config } = useConfig()
+  useAppearance(config)
   const { mode, setMode } = useTheme(config?.preferred_theme)
   const { servers, sysConfig, regionStats, loading, error, connected } =
     useServers(config?.frontend_ws_timeout_minutes ?? 0)
@@ -140,6 +142,13 @@ export function Dashboard() {
                 showPrice={sysConfig?.show_price !== false}
                 showExpire={sysConfig?.show_expire !== false}
                 showTraffic={sysConfig?.show_tf !== false}
+                showThreeNet={sysConfig?.show_three_net_details !== false}
+                netNames={{
+                  ct: config?.custom_ct_name || '电信',
+                  cu: config?.custom_cu_name || '联通',
+                  cm: config?.custom_cm_name || '移动',
+                  bd: config?.custom_bd_name || 'BGP',
+                }}
               />
             ))}
       </div>

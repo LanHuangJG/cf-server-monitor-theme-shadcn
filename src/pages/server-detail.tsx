@@ -18,6 +18,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { useConfig } from '@/hooks/use-config'
+import { useAppearance } from '@/hooks/use-appearance'
 import { useServerDetail } from '@/hooks/use-server-detail'
 import { useTheme } from '@/hooks/use-theme'
 import {
@@ -46,6 +47,7 @@ function Stat({ label, value }: { label: string; value: string }) {
 export function ServerDetail() {
   const { id } = useParams<{ id: string }>()
   const { config } = useConfig()
+  useAppearance(config)
   const { mode, setMode } = useTheme(config?.preferred_theme)
   const { server, history, hours, setHours, loading, error } = useServerDetail(
     id,
@@ -271,6 +273,12 @@ export function ServerDetail() {
               onHoursChange={setHours}
               loading={loading}
               error={error}
+              netNames={{
+                ct: config?.custom_ct_name || '电信',
+                cu: config?.custom_cu_name || '联通',
+                cm: config?.custom_cm_name || '移动',
+                bd: config?.custom_bd_name || 'BGP',
+              }}
             />
           </CardContent>
         </Card>

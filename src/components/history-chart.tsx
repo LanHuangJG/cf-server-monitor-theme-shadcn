@@ -12,13 +12,14 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { formatSpeed } from '@/lib/format'
 import type { HistoryPoint } from '@/lib/types'
 
-type MetricKey = 'cpu' | 'ram' | 'network' | 'load'
+type MetricKey = 'cpu' | 'ram' | 'network' | 'load' | 'latency'
 
 const METRICS: { key: MetricKey; label: string }[] = [
   { key: 'cpu', label: 'CPU' },
   { key: 'ram', label: '内存' },
   { key: 'network', label: '网络' },
   { key: 'load', label: '负载' },
+  { key: 'latency', label: '三网延迟' },
 ]
 
 export const RANGES = [
@@ -28,6 +29,20 @@ export const RANGES = [
   { label: '7 天', hours: 168 },
 ]
 
+export interface NetNames {
+  ct: string
+  cu: string
+  cm: string
+  bd: string
+}
+
+const DEFAULT_NET_NAMES: NetNames = {
+  ct: '电信',
+  cu: '联通',
+  cm: '移动',
+  bd: 'BGP',
+}
+
 function timeLabel(ts: number, hours: number): string {
   const d = new Date(ts)
   if (hours <= 24) {
@@ -36,18 +51,22 @@ function timeLabel(ts: number, hours: number): string {
   return d.toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })
 }
 
+const num = (v: unknown): number | null => (typeof v === 'number' ? v : null)
+
 export function HistoryChart({
   history,
   hours,
   onHoursChange,
   loading,
   error,
+  netNames = DEFAULT_NET_NAMES,
 }: {
   history: HistoryPoint[]
   hours: number
   onHoursChange: (hours: number) => void
   loading: boolean
   error?: string | null
+  netNames?: NetNames
 }) {
   const [metric, setMetric] = React.useState<MetricKey>('cpu')
 
@@ -66,24 +85,36 @@ export function HistoryChart({
           load: Number.isFinite(load) ? load : 0,
           netIn: row.net_in_speed ?? 0,
           netOut: row.net_out_speed ?? 0,
+          ct: num(row.ping_ct),
+          cu: num(row.ping_cu),
+          cm: num(row.ping_cm),
+          bd: num(row.ping_bd),
         }
       }),
     [history]
   )
 
   const isNetwork = metric === 'network'
+  const isLatency = metric === 'latency'
 
   const config: ChartConfig = isNetwork
     ? {
         netIn: { label: '下行', color: 'var(--chart-1)' },
         netOut: { label: '上行', color: 'var(--chart-3)' },
       }
-    : {
-        [metric]: {
-          label: METRICS.find((m) => m.key === metric)?.label ?? metric,
-          color: 'var(--chart-1)',
-        },
-      }
+    : isLatency
+      ? {
+          ct: { label: netNames.ct, color: 'var(--chart-1)' },
+          cu: { label: netNames.cu, color: 'var(--chart-2)' },
+          cm: { label: netNames.cm, color: 'var(--chart-4)' },
+          bd: { label: netNames.bd, color: 'var(--chart-3)' },
+        }
+      : {
+          [metric]: {
+            label: METRICS.find((m) => m.key === metric)?.label ?? metric,
+            color: 'var(--chart-1)',
+          },
+        }
 
   return (
     <div className="space-y-4">
@@ -143,8 +174,13 @@ export function HistoryChart({
                 axisLine={false}
                 width={64}
                 tickFormatter={(v: number) =>
-                  isNetwork ? formatSpeed(v) : `${Math.round(v)}`
+                  isNetwork
+                    ? formatSpeed(v)
+                    : isLatency
+                      ? `${Math.round(v)}ms`
+                      : `${Math.round(v)}`
                 }
+                domain={isLatency ? ['auto', 'auto'] : undefined}
               />
               <ChartTooltip
                 cursor={false}
@@ -157,7 +193,9 @@ export function HistoryChart({
                     formatter={(value) =>
                       isNetwork
                         ? formatSpeed(Number(value))
-                        : `${Number(value).toFixed(1)}${metric === 'cpu' || metric === 'ram' ? '%' : ''}`
+                        : isLatency
+                          ? `${Number(value).toFixed(1)} ms`
+                          : `${Number(value).toFixed(1)}${metric === 'cpu' || metric === 'ram' ? '%' : ''}`
                     }
                   />
                 }
@@ -182,6 +220,22 @@ export function HistoryChart({
                     strokeWidth={2}
                     isAnimationActive={false}
                   />
+                </>
+              ) : isLatency ? (
+                <>
+                  {(['ct', 'cu', 'cm', 'bd'] as const).map((key) => (
+                    <Area
+                      key={key}
+                      type="monotone"
+                      dataKey={key}
+                      stroke={`var(--color-${key})`}
+                      fill="transparent"
+                      fillOpacity={0}
+                      strokeWidth={2}
+                      connectNulls
+                      isAnimationActive={false}
+                    />
+                  ))}
                 </>
               ) : (
                 <Area
