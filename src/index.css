@@ -184,4 +184,15 @@
   html[data-glass="true"] [data-slot="card"] {
     backdrop-filter: blur(14px) saturate(1.15);
   }
+  /* Magic UI 风格的背景纹理（主题设置可选） */
+  html[data-bg="dots"] body {
+    background-image: radial-gradient(var(--border) 1px, transparent 1px);
+    background-size: 18px 18px;
+  }
+  html[data-bg="grid"] body {
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
 }

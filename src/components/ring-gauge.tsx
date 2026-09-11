@@ -1,3 +1,5 @@
+import { NumberTicker } from '@/components/number-ticker'
+
 export function RingGauge({
   value,
   label,
@@ -49,7 +51,7 @@ export function RingGauge({
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center text-xs font-semibold tabular-nums">
-          {pct.toFixed(0)}%
+          <NumberTicker value={pct} />%
         </div>
       </div>
       <div className="text-[11px] text-muted-foreground">{label}</div>

@@ -1,5 +1,6 @@
-import { ArrowDown, ArrowUp, Server } from 'lucide-react'
+import { ArrowDown, ArrowUp, LoaderCircle, Server, Wifi, WifiOff } from 'lucide-react'
 
+import { NumberTicker } from '@/components/number-ticker'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -47,9 +48,13 @@ export function SummaryCards({
 
   const offline = Math.max(0, total - online)
   const conn = {
-    connected: { dot: 'bg-emerald-500', text: '已连接' },
-    connecting: { dot: 'bg-amber-500 animate-pulse', text: '连接中…' },
-    disconnected: { dot: 'bg-destructive', text: '已断开' },
+    connected: { icon: Wifi, cls: 'text-emerald-500', text: '已连接' },
+    connecting: {
+      icon: LoaderCircle,
+      cls: 'text-amber-500 animate-spin',
+      text: '连接中…',
+    },
+    disconnected: { icon: WifiOff, cls: 'text-destructive', text: '已断开' },
   }[connection]
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -65,18 +70,13 @@ export function SummaryCards({
         <CardContent>
           <div className="flex items-baseline gap-2">
             <span className="text-2xl font-semibold tabular-nums">
-              {online}
+              <NumberTicker value={online} />
               <span className="text-muted-foreground"> / {total}</span>
             </span>
             {offline > 0 && <Badge variant="destructive">{offline} 离线</Badge>}
           </div>
           <p className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
-            <span
-              className={cn(
-                'inline-block size-1.5 rounded-full',
-                conn.dot
-              )}
-            />
+            <conn.icon className={cn('size-3.5', conn.cls)} />
             {conn.text}
           </p>
         </CardContent>

@@ -4,9 +4,11 @@ import { Link } from 'react-router-dom'
 import { MetricBar } from '@/components/metric-bar'
 import { PingSparkline } from '@/components/ping-sparkline'
 import { RingGauge } from '@/components/ring-gauge'
+import { UptimeBar } from '@/components/uptime-bar'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
+import type { UptimeInfo } from '@/hooks/use-uptime'
 import {
   formatBytes,
   formatExpiry,
@@ -64,6 +66,7 @@ export function ServerCard({
   showTraffic = true,
   showThreeNet = false,
   variant = 'grid',
+  uptime,
   netNames = { ct: '电信', cu: '联通', cm: '移动', bd: 'BGP' },
 }: {
   server: Server
@@ -72,6 +75,7 @@ export function ServerCard({
   showTraffic?: boolean
   showThreeNet?: boolean
   variant?: 'grid' | 'ring'
+  uptime?: UptimeInfo
   netNames?: { ct: string; cu: string; cm: string; bd: string }
 }) {
   const online = isOnline(server)
@@ -201,6 +205,8 @@ export function ServerCard({
               {pingWindow.length > 1 && <PingSparkline points={pingWindow} />}
             </div>
           )}
+
+          <UptimeBar info={uptime} className="pt-1" />
 
           <Separator />
 

@@ -7,6 +7,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { saveThemeOptions } from '@/lib/api'
 import type { ApiConfig } from '@/lib/types'
 import { cn } from '@/lib/utils'
@@ -34,6 +35,9 @@ export function ThemeSettings({ config }: { config: ApiConfig }) {
   const [bg, setBg] = React.useState<string>(
     typeof options.bg === 'string' ? options.bg : ''
   )
+  const [bgPattern, setBgPattern] = React.useState<string>(
+    typeof options.bgPattern === 'string' ? options.bgPattern : ''
+  )
   const [footerText, setFooterText] = React.useState<string>(
     typeof options.footer === 'string' ? options.footer : ''
   )
@@ -51,9 +55,15 @@ export function ThemeSettings({ config }: { config: ApiConfig }) {
     else delete root.dataset.glass
 
     const url = bg.trim()
-    if (url) root.style.setProperty('--theme-bg-image', `url("${url}")`)
-    else root.style.removeProperty('--theme-bg-image')
-  }, [accent, opacity, bg])
+    if (url) {
+      root.style.setProperty('--theme-bg-image', `url("${url}")`)
+      delete root.dataset.bg
+    } else {
+      root.style.removeProperty('--theme-bg-image')
+      if (bgPattern === 'dots' || bgPattern === 'grid') root.dataset.bg = bgPattern
+      else delete root.dataset.bg
+    }
+  }, [accent, opacity, bg, bgPattern])
 
   const onSave = async () => {
     if (!authorized) {
@@ -69,6 +79,7 @@ export function ThemeSettings({ config }: { config: ApiConfig }) {
         cardOpacity: opacity,
         bg: bg.trim(),
         footer: footerText.trim(),
+        bgPattern,
       })
       window.location.reload()
     } catch (err) {
@@ -142,6 +153,26 @@ export function ThemeSettings({ config }: { config: ApiConfig }) {
         </div>
 
         <div className="space-y-2">
+          <div className="text-sm font-medium">背景样式</div>
+          <Tabs
+            value={bgPattern || 'none'}
+            onValueChange={(v) => setBgPattern(v === 'none' ? '' : v)}
+          >
+            <TabsList className="w-full">
+              <TabsTrigger value="none" className="flex-none px-3">
+                无
+              </TabsTrigger>
+              <TabsTrigger value="dots" className="flex-none px-3">
+                点阵
+              </TabsTrigger>
+              <TabsTrigger value="grid" className="flex-none px-3">
+                网格
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
+
+        <div className="space-y-2">
           <div className="text-sm font-medium">页脚文字</div>
           <input
             value={footerText}
@@ -169,6 +200,7 @@ export function ThemeSettings({ config }: { config: ApiConfig }) {
               setAccent('default')
               setOpacity(100)
               setBg('')
+              setBgPattern('')
               setFooterText('')
               setMessage(null)
             }}

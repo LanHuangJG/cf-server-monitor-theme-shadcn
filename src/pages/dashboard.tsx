@@ -15,6 +15,7 @@ import { useConfig } from '@/hooks/use-config'
 import { useAppearance } from '@/hooks/use-appearance'
 import { useServers } from '@/hooks/use-servers'
 import { useTheme } from '@/hooks/use-theme'
+import { useUptime } from '@/hooks/use-uptime'
 import { isOnline } from '@/lib/format'
 
 export function Dashboard() {
@@ -58,6 +59,11 @@ export function Dashboard() {
         ? sorted
         : sorted.filter((s) => s.region === region),
     [sorted, region]
+  )
+
+  const uptime = useUptime(
+    React.useMemo(() => sorted.map((s) => s.id), [sorted]),
+    24
   )
 
   const summary = React.useMemo(() => {
@@ -180,6 +186,7 @@ export function Dashboard() {
               key={server.id}
               server={server}
               variant={view === 'ring' ? 'ring' : 'grid'}
+              uptime={uptime[server.id]}
               showPrice={sysConfig?.show_price !== false}
               showExpire={sysConfig?.show_expire !== false}
               showTraffic={sysConfig?.show_tf !== false}
