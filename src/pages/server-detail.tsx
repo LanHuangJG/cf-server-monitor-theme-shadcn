@@ -31,6 +31,7 @@ import {
   formatUptime,
   isOnline,
   timeAgo,
+  formatTrafficPercent,
   trafficLimitBytes,
   trafficUsedBytes,
   usedPercent,
@@ -227,7 +228,7 @@ export function ServerDetail() {
                 <MetricBar
                   label="流量使用"
                   percent={trafficPercent}
-                  value={`${trafficPercent.toFixed(1)}%`}
+                  value={formatTrafficPercent(trafficPercent)}
                 />
               </>
             )}

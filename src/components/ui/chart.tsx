@@ -197,11 +197,8 @@ function ChartTooltipContent({
                 indicator === 'dot' && 'items-center'
               )}
             >
-              {formatter && item?.value !== undefined && item.name ? (
-                formatter(item.value, item.name, item, index, item.payload)
-              ) : (
-                <>
-                  {itemConfig?.icon ? (
+              <>
+                {itemConfig?.icon ? (
                     <itemConfig.icon />
                   ) : (
                     !hideIndicator && (
@@ -239,14 +236,21 @@ function ChartTooltipContent({
                     </div>
                     {item.value !== undefined && (
                       <span className="text-foreground font-mono font-medium tabular-nums">
-                        {typeof item.value === 'number'
-                          ? item.value.toLocaleString()
-                          : item.value}
+                        {formatter
+                          ? formatter(
+                              item.value,
+                              item.name,
+                              item,
+                              index,
+                              item.payload
+                            )
+                          : typeof item.value === 'number'
+                            ? item.value.toLocaleString()
+                            : item.value}
                       </span>
                     )}
                   </div>
                 </>
-              )}
             </div>
           )
         })}

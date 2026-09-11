@@ -133,3 +133,10 @@ export function trafficUsedBytes(server: {
       return rx + tx
   }
 }
+
+export function formatTrafficPercent(percent: number): string {
+  if (!Number.isFinite(percent) || percent <= 0) return '0%'
+  if (percent < 0.01) return '<0.01%'
+  if (percent < 1) return `${percent.toFixed(2)}%`
+  return `${percent.toFixed(1)}%`
+}

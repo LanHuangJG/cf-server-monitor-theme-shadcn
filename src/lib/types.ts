@@ -169,6 +169,7 @@ export interface ApiConfig {
   custom_cm_name: string
   custom_bd_name: string
   site_title: string
+  display_mode: string
   preferred_theme: string
   default_language: string
   theme_options: Record<string, unknown>

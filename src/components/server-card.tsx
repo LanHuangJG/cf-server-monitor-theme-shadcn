@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 
 import { MetricBar } from '@/components/metric-bar'
 import { PingSparkline } from '@/components/ping-sparkline'
+import { RingGauge } from '@/components/ring-gauge'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
@@ -62,6 +63,7 @@ export function ServerCard({
   showExpire = true,
   showTraffic = true,
   showThreeNet = false,
+  variant = 'grid',
   netNames = { ct: '电信', cu: '联通', cm: '移动', bd: 'BGP' },
 }: {
   server: Server
@@ -69,6 +71,7 @@ export function ServerCard({
   showExpire?: boolean
   showTraffic?: boolean
   showThreeNet?: boolean
+  variant?: 'grid' | 'ring'
   netNames?: { ct: string; cu: string; cm: string; bd: string }
 }) {
   const online = isOnline(server)
@@ -92,10 +95,10 @@ export function ServerCard({
     { key: 'cu', label: netNames.cu, value: server.ping_cu, loss: server.loss_cu },
     { key: 'cm', label: netNames.cm, value: server.ping_cm, loss: server.loss_cm },
     { key: 'bd', label: netNames.bd, value: server.ping_bd, loss: server.loss_bd },
-  ]
-  const hasPing = nets.some(
+  ].filter(
     (n) => typeof n.value === 'number' || typeof n.loss === 'number'
   )
+  const hasPing = nets.length > 0
   const pingWindow = server.ping || []
 
   const showBilling = showPrice || showExpire
@@ -128,33 +131,58 @@ export function ServerCard({
         </CardHeader>
 
         <CardContent className="space-y-3 px-5">
-          <MetricBar label="CPU" percent={cpu} value={`${cpu.toFixed(1)}%`} />
-          <MetricBar
-            label={`内存 ${ramPercent.toFixed(0)}%`}
-            percent={ramPercent}
-            value={`${formatMB(server.ram_used)} / ${formatMB(server.ram_total)}`}
-          />
-          <MetricBar
-            label={`磁盘 ${diskPercent.toFixed(0)}%`}
-            percent={diskPercent}
-            value={`${formatMB(server.disk_used)} / ${formatMB(server.disk_total)}`}
-          />
+          {variant === 'ring' ? (
+            <div className="flex justify-around gap-1 py-1">
+              <RingGauge value={cpu} label="CPU" />
+              <RingGauge
+                value={ramPercent}
+                label="内存"
+                sublabel={formatMB(server.ram_used)}
+              />
+              <RingGauge
+                value={diskPercent}
+                label="磁盘"
+                sublabel={formatMB(server.disk_used)}
+              />
+              {showTraffic && limitBytes && (
+                <RingGauge
+                  value={trafficPercent}
+                  label="流量"
+                  sublabel={formatBytes(usedBytes)}
+                />
+              )}
+            </div>
+          ) : (
+            <>
+              <MetricBar label="CPU" percent={cpu} value={`${cpu.toFixed(1)}%`} />
+              <MetricBar
+                label={`内存 ${ramPercent.toFixed(0)}%`}
+                percent={ramPercent}
+                value={`${formatMB(server.ram_used)} / ${formatMB(server.ram_total)}`}
+              />
+              <MetricBar
+                label={`磁盘 ${diskPercent.toFixed(0)}%`}
+                percent={diskPercent}
+                value={`${formatMB(server.disk_used)} / ${formatMB(server.disk_total)}`}
+              />
 
-          {showTraffic && limitBytes && (
-            <MetricBar
-              label="流量"
-              percent={trafficPercent}
-              value={`${formatBytes(usedBytes)} / ${formatBytes(limitBytes)}`}
-            />
+              {showTraffic && limitBytes && (
+                <MetricBar
+                  label="流量"
+                  percent={trafficPercent}
+                  value={`${formatBytes(usedBytes)} / ${formatBytes(limitBytes)}`}
+                />
+              )}
+            </>
           )}
 
           {showThreeNet && hasPing && (
             <div className="space-y-2">
-              <div className="grid grid-cols-4 gap-1">
+              <div className="flex gap-1">
                 {nets.map((n) => (
                   <div
                     key={n.key}
-                    className="rounded-md bg-muted/50 px-1 py-1 text-center"
+                    className="flex-1 rounded-md bg-muted/50 px-1 py-1 text-center"
                   >
                     <div className="text-[10px] text-muted-foreground">
                       {n.label}

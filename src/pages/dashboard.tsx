@@ -3,9 +3,11 @@ import * as React from 'react'
 
 import { Footer } from '@/components/footer'
 import { ServerCard } from '@/components/server-card'
+import { ServerTable } from '@/components/server-table'
 import { SummaryCards } from '@/components/summary-cards'
 import { ThemeSettings } from '@/components/theme-settings'
 import { ThemeToggle } from '@/components/theme-toggle'
+import { ViewSwitcher, type ViewMode } from '@/components/view-switcher'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -22,6 +24,23 @@ export function Dashboard() {
   const { servers, sysConfig, regionStats, loading, error, connection } =
     useServers(config?.frontend_ws_timeout_minutes ?? 0)
   const [region, setRegion] = React.useState('all')
+  const [view, setView] = React.useState<ViewMode>('grid')
+
+  React.useEffect(() => {
+    const saved = localStorage.getItem('cfsm-view')
+    if (saved === 'grid' || saved === 'table' || saved === 'ring') {
+      setView(saved)
+    } else if (config?.display_mode === 'table') {
+      setView('table')
+    } else if (config?.display_mode === 'ring') {
+      setView('ring')
+    }
+  }, [config?.display_mode])
+
+  const changeView = React.useCallback((next: ViewMode) => {
+    localStorage.setItem('cfsm-view', next)
+    setView(next)
+  }, [])
 
   const sorted = React.useMemo(
     () =>
@@ -82,6 +101,7 @@ export function Dashboard() {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <ViewSwitcher value={view} onChange={changeView} />
           {config && <ThemeSettings config={config} />}
           <Button variant="outline" size="icon" asChild>
             <a href="/admin#admin" aria-label="管理后台" title="管理后台">
@@ -132,28 +152,42 @@ export function Dashboard() {
         </div>
       )}
 
-      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {loading
-          ? Array.from({ length: 3 }).map((_, i) => (
-              <Skeleton key={i} className="h-64 rounded-xl" />
-            ))
-          : filtered.map((server) => (
-              <ServerCard
-                key={server.id}
-                server={server}
-                showPrice={sysConfig?.show_price !== false}
-                showExpire={sysConfig?.show_expire !== false}
-                showTraffic={sysConfig?.show_tf !== false}
-                showThreeNet={sysConfig?.show_three_net_details !== false}
-                netNames={{
-                  ct: config?.custom_ct_name || '电信',
-                  cu: config?.custom_cu_name || '联通',
-                  cm: config?.custom_cm_name || '移动',
-                  bd: config?.custom_bd_name || 'BGP',
-                }}
-              />
-            ))}
-      </div>
+      {loading ? (
+        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Skeleton key={i} className="h-64 rounded-xl" />
+          ))}
+        </div>
+      ) : view === 'table' ? (
+        <div className="mt-6">
+          <ServerTable
+            servers={filtered}
+            showPrice={sysConfig?.show_price !== false}
+            showExpire={sysConfig?.show_expire !== false}
+            showTraffic={sysConfig?.show_tf !== false}
+          />
+        </div>
+      ) : (
+        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {filtered.map((server) => (
+            <ServerCard
+              key={server.id}
+              server={server}
+              variant={view === 'ring' ? 'ring' : 'grid'}
+              showPrice={sysConfig?.show_price !== false}
+              showExpire={sysConfig?.show_expire !== false}
+              showTraffic={sysConfig?.show_tf !== false}
+              showThreeNet={sysConfig?.show_three_net_details !== false}
+              netNames={{
+                ct: config?.custom_ct_name || '电信',
+                cu: config?.custom_cu_name || '联通',
+                cm: config?.custom_cm_name || '移动',
+                bd: config?.custom_bd_name || 'BGP',
+              }}
+            />
+          ))}
+        </div>
+      )}
 
       {!loading && filtered.length === 0 && !error && (
         <div className="py-16 text-center text-sm text-muted-foreground">
