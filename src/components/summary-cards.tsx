@@ -52,7 +52,9 @@ export function SummaryCards({
           <CardTitle className="text-sm font-medium text-muted-foreground">
             在线节点
           </CardTitle>
-          <Server className="size-4 text-muted-foreground" />
+          <span className="flex size-7 items-center justify-center rounded-md bg-primary/10 text-primary">
+            <Server className="size-4" />
+          </span>
         </CardHeader>
         <CardContent>
           <div className="flex items-baseline gap-2">
@@ -79,7 +81,9 @@ export function SummaryCards({
           <CardTitle className="text-sm font-medium text-muted-foreground">
             实时速率
           </CardTitle>
-          <ArrowDown className="size-4 text-muted-foreground" />
+          <span className="flex size-7 items-center justify-center rounded-md bg-success/10 text-success">
+            <ArrowDown className="size-4" />
+          </span>
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-semibold tabular-nums">
@@ -96,7 +100,9 @@ export function SummaryCards({
           <CardTitle className="text-sm font-medium text-muted-foreground">
             累计下载
           </CardTitle>
-          <ArrowDown className="size-4 text-muted-foreground" />
+          <span className="flex size-7 items-center justify-center rounded-md bg-chart-3/10 text-chart-3">
+            <ArrowDown className="size-4" />
+          </span>
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-semibold tabular-nums">
@@ -111,7 +117,9 @@ export function SummaryCards({
           <CardTitle className="text-sm font-medium text-muted-foreground">
             累计上传
           </CardTitle>
-          <ArrowUp className="size-4 text-muted-foreground" />
+          <span className="flex size-7 items-center justify-center rounded-md bg-warning/15 text-warning">
+            <ArrowUp className="size-4" />
+          </span>
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-semibold tabular-nums">

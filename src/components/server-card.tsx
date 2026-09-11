@@ -53,7 +53,7 @@ export function ServerCard({ server }: { server: Server }) {
     <Link to={`/server/${server.id}`} className="group block">
       <Card
         className={cn(
-          'h-full gap-4 py-5 transition-colors group-hover:border-primary/40',
+          'h-full gap-4 py-5 transition-all duration-200 group-hover:-translate-y-0.5 group-hover:border-primary/40 group-hover:shadow-md',
           !online && 'opacity-70'
         )}
       >
