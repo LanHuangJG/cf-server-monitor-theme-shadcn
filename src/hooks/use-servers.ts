@@ -9,6 +9,8 @@ import type {
   WsBatchUpdate,
 } from '@/lib/types'
 
+export type ConnectionState = 'connecting' | 'connected' | 'disconnected'
+
 function applySample(server: Server, sample: Sample): Server {
   const patch = sample.data || sample.payload || sample.metrics || {}
   return { ...server, ...patch, last_updated: sample.ts || Date.now() }
@@ -23,7 +25,7 @@ export function useServers(wsTimeoutMinutes = 0) {
   )
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState<string | null>(null)
-  const [connected, setConnected] = React.useState(false)
+  const [connection, setConnection] = React.useState<ConnectionState>('connecting')
 
   const serversRef = React.useRef<Server[]>([])
   serversRef.current = servers
@@ -73,7 +75,7 @@ export function useServers(wsTimeoutMinutes = 0) {
         }
         ws = null
       }
-      setConnected(false)
+      setConnection('disconnected')
     }
 
     const connect = () => {
@@ -91,10 +93,11 @@ export function useServers(wsTimeoutMinutes = 0) {
         return
       }
       closedByUs = false
+      setConnection('connecting')
       const socket = new WebSocket(wsUrl('/api/ws?subscribe=all'))
       ws = socket
       socket.onopen = () => {
-        setConnected(true)
+        setConnection('connected')
         socket.send(JSON.stringify({ type: 'subscribe', scope: 'all', ids }))
         if (wsTimeoutMinutes > 0) {
           timeoutTimer = setTimeout(
@@ -123,7 +126,7 @@ export function useServers(wsTimeoutMinutes = 0) {
         })
       }
       socket.onclose = () => {
-        setConnected(false)
+        setConnection('disconnected')
         ws = null
         if (closedByUs || document.hidden) return
         reconnectTimer = setTimeout(connect, 5000)
@@ -168,7 +171,7 @@ export function useServers(wsTimeoutMinutes = 0) {
     regionStats,
     loading,
     error,
-    connected,
+    connection,
     reload: load,
   }
 }

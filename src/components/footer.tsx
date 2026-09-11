@@ -1,6 +1,13 @@
-export function Footer({ version }: { version?: string }) {
+export function Footer({
+  version,
+  text,
+}: {
+  version?: string
+  text?: string
+}) {
   return (
     <footer className="mt-10 border-t py-6 text-center text-xs text-muted-foreground">
+      {text && <p className="mb-1">{text}</p>}
       <p>
         Powered by{' '}
         <a

@@ -3,6 +3,7 @@ import { ArrowDown, ArrowUp, Server } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
+import type { ConnectionState } from '@/hooks/use-servers'
 import { formatBytes, formatSpeed } from '@/lib/format'
 import { cn } from '@/lib/utils'
 
@@ -22,7 +23,7 @@ export function SummaryCards({
   speedOut: number
   netRx: number
   netTx: number
-  connection: boolean
+  connection: ConnectionState
   loading?: boolean
 }) {
   if (loading) {
@@ -45,6 +46,11 @@ export function SummaryCards({
   }
 
   const offline = Math.max(0, total - online)
+  const conn = {
+    connected: { dot: 'bg-emerald-500', text: '已连接' },
+    connecting: { dot: 'bg-amber-500 animate-pulse', text: '连接中…' },
+    disconnected: { dot: 'bg-destructive', text: '已断开' },
+  }[connection]
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
       <Card>
@@ -68,10 +74,10 @@ export function SummaryCards({
             <span
               className={cn(
                 'inline-block size-1.5 rounded-full',
-                connection ? 'bg-emerald-500' : 'bg-muted-foreground'
+                conn.dot
               )}
             />
-            {connection ? '实时连接中' : '实时连接已断开'}
+            {conn.text}
           </p>
         </CardContent>
       </Card>

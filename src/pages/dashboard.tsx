@@ -19,7 +19,7 @@ export function Dashboard() {
   const { config } = useConfig()
   useAppearance(config)
   const { mode, setMode } = useTheme(config?.preferred_theme)
-  const { servers, sysConfig, regionStats, loading, error, connected } =
+  const { servers, sysConfig, regionStats, loading, error, connection } =
     useServers(config?.frontend_ws_timeout_minutes ?? 0)
   const [region, setRegion] = React.useState('all')
 
@@ -99,7 +99,7 @@ export function Dashboard() {
         speedOut={summary.speedOut}
         netRx={summary.netRx}
         netTx={summary.netTx}
-        connection={connected}
+        connection={connection}
         loading={loading}
       />
 
@@ -161,7 +161,14 @@ export function Dashboard() {
         </div>
       )}
 
-      <Footer version={config?.version} />
+      <Footer
+        version={config?.version}
+        text={
+          typeof config?.theme_options?.footer === 'string'
+            ? config.theme_options.footer
+            : ''
+        }
+      />
     </div>
   )
 }

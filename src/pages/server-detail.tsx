@@ -64,7 +64,14 @@ export function ServerDetail() {
           <div className="rounded-lg border border-destructive/40 bg-destructive/5 p-4 text-sm text-destructive">
             加载失败：{error}
           </div>
-          <Footer version={config?.version} />
+          <Footer
+        version={config?.version}
+        text={
+          typeof config?.theme_options?.footer === 'string'
+            ? config.theme_options.footer
+            : ''
+        }
+      />
         </div>
       )
     }
@@ -286,7 +293,14 @@ export function ServerDetail() {
         </Card>
       </div>
 
-      <Footer version={config?.version} />
+      <Footer
+        version={config?.version}
+        text={
+          typeof config?.theme_options?.footer === 'string'
+            ? config.theme_options.footer
+            : ''
+        }
+      />
     </div>
   )
 }

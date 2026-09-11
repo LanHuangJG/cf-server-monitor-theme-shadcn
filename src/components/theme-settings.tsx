@@ -34,6 +34,9 @@ export function ThemeSettings({ config }: { config: ApiConfig }) {
   const [bg, setBg] = React.useState<string>(
     typeof options.bg === 'string' ? options.bg : ''
   )
+  const [footerText, setFooterText] = React.useState<string>(
+    typeof options.footer === 'string' ? options.footer : ''
+  )
   const [saving, setSaving] = React.useState(false)
   const [message, setMessage] = React.useState<string | null>(null)
 
@@ -65,6 +68,7 @@ export function ThemeSettings({ config }: { config: ApiConfig }) {
         accent: accent === 'default' ? '' : accent,
         cardOpacity: opacity,
         bg: bg.trim(),
+        footer: footerText.trim(),
       })
       window.location.reload()
     } catch (err) {
@@ -137,6 +141,19 @@ export function ThemeSettings({ config }: { config: ApiConfig }) {
           </p>
         </div>
 
+        <div className="space-y-2">
+          <div className="text-sm font-medium">页脚文字</div>
+          <input
+            value={footerText}
+            onChange={(e) => setFooterText(e.target.value)}
+            placeholder="自定义页脚（可留空）"
+            className="w-full rounded-md border bg-background px-2 py-1.5 text-sm outline-none focus:ring-2 focus:ring-ring"
+          />
+          <p className="text-xs text-muted-foreground">
+            站点标题在后台「设置 → 站点标题」改
+          </p>
+        </div>
+
         {message && <p className="text-xs text-destructive">{message}</p>}
         {!authorized && !message && (
           <p className="text-xs text-muted-foreground">
@@ -152,6 +169,7 @@ export function ThemeSettings({ config }: { config: ApiConfig }) {
               setAccent('default')
               setOpacity(100)
               setBg('')
+              setFooterText('')
               setMessage(null)
             }}
           >

@@ -99,18 +99,36 @@ export function HistoryChart({
   const isNetwork = metric === 'network'
   const isLatency = metric === 'latency'
 
+  const latencyKeys = React.useMemo(
+    () =>
+      (['ct', 'cu', 'cm', 'bd'] as const).filter((k) =>
+        data.some((d) => d[k] !== null)
+      ),
+    [data]
+  )
+
   const config: ChartConfig = isNetwork
     ? {
         netIn: { label: '下行', color: 'var(--chart-1)' },
         netOut: { label: '上行', color: 'var(--chart-3)' },
       }
     : isLatency
-      ? {
-          ct: { label: netNames.ct, color: 'var(--chart-1)' },
-          cu: { label: netNames.cu, color: 'var(--chart-2)' },
-          cm: { label: netNames.cm, color: 'var(--chart-4)' },
-          bd: { label: netNames.bd, color: 'var(--chart-3)' },
-        }
+      ? Object.fromEntries(
+          latencyKeys.map((k) => [
+            k,
+            {
+              label: netNames[k],
+              color:
+                k === 'ct'
+                  ? 'var(--chart-1)'
+                  : k === 'cu'
+                    ? 'var(--chart-2)'
+                    : k === 'cm'
+                      ? 'var(--chart-4)'
+                      : 'var(--chart-3)',
+            },
+          ])
+        )
       : {
           [metric]: {
             label: METRICS.find((m) => m.key === metric)?.label ?? metric,
@@ -154,6 +172,10 @@ export function HistoryChart({
         ) : data.length === 0 ? (
           <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
             暂无历史数据
+          </div>
+        ) : isLatency && latencyKeys.length === 0 ? (
+          <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+            暂无延迟数据
           </div>
         ) : (
           <ChartContainer config={config} className="aspect-auto h-full w-full">
@@ -225,7 +247,7 @@ export function HistoryChart({
                 </>
               ) : isLatency ? (
                 <>
-                  {(['ct', 'cu', 'cm', 'bd'] as const).map((key) => (
+                  {latencyKeys.map((key) => (
                     <Area
                       key={key}
                       type="monotone"
