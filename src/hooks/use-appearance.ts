@@ -2,10 +2,10 @@ import * as React from 'react'
 
 import type { ApiConfig } from '@/lib/types'
 
-// 应用主题自定义外观：
-// theme_options = { "bg": "https://.../bg.jpg", "glass": false }
-//   bg    —— 主题级背景图（CF-SM 后台「外观→背景图片」也会注入，二者都可）
-//   glass —— 卡片是否半透明毛玻璃，默认 true
+// 主题自定义配置（theme_options）：
+//   accent      主色预设：default / blue / violet / emerald / teal / rose / amber / orange
+//   cardOpacity 卡片透明度 20-100（100 = 不透明，shadcn 默认）
+//   bg          背景图 URL（也可用后台「外观→背景图片」）
 export function useAppearance(config: ApiConfig | null) {
   React.useEffect(() => {
     const root = document.documentElement
@@ -18,6 +18,23 @@ export function useAppearance(config: ApiConfig | null) {
       root.style.removeProperty('--theme-bg-image')
     }
 
-    root.classList.toggle('no-glass', options.glass === false)
+    const accent =
+      typeof options.accent === 'string' ? options.accent.trim() : ''
+    if (accent && accent !== 'default') {
+      root.dataset.accent = accent
+    } else {
+      delete root.dataset.accent
+    }
+
+    const raw = Number(options.cardOpacity)
+    const opacity = Number.isFinite(raw)
+      ? Math.min(100, Math.max(10, raw))
+      : 100
+    root.style.setProperty('--card-opacity', String(opacity / 100))
+    if (opacity < 100) {
+      root.dataset.glass = 'true'
+    } else {
+      delete root.dataset.glass
+    }
   }, [config])
 }

@@ -32,69 +32,134 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
-  --color-success: var(--success);
-  --color-warning: var(--warning);
 }
 
+/* shadcn/ui 默认 neutral 主题 */
 :root {
-  --radius: 0.75rem;
-  /* 页面底略灰、卡片纯白，制造层次 */
-  --background: oklch(0.984 0.003 264);
-  --foreground: oklch(0.19 0.02 264);
+  --radius: 0.625rem;
+  --card-opacity: 1;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.19 0.02 264);
+  --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.19 0.02 264);
-  /* 主色：靛蓝 */
-  --primary: oklch(0.52 0.19 268);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
   --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.965 0.006 264);
-  --secondary-foreground: oklch(0.28 0.03 264);
-  --muted: oklch(0.965 0.006 264);
-  --muted-foreground: oklch(0.55 0.02 264);
-  --accent: oklch(0.955 0.012 268);
-  --accent-foreground: oklch(0.32 0.05 268);
-  --destructive: oklch(0.58 0.23 27);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.918 0.008 264);
-  --input: oklch(0.918 0.008 264);
-  --ring: oklch(0.62 0.16 268);
-  --chart-1: oklch(0.58 0.20 268);
-  --chart-2: oklch(0.70 0.15 162);
-  --chart-3: oklch(0.62 0.22 300);
-  --chart-4: oklch(0.78 0.16 75);
-  --chart-5: oklch(0.65 0.20 20);
-  --success: oklch(0.70 0.17 152);
-  --warning: oklch(0.80 0.16 80);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
 }
 
 .dark {
-  --background: oklch(0.16 0.012 268);
-  --foreground: oklch(0.97 0.005 264);
-  --card: oklch(0.21 0.014 268);
-  --card-foreground: oklch(0.97 0.005 264);
-  --popover: oklch(0.21 0.014 268);
-  --popover-foreground: oklch(0.97 0.005 264);
-  --primary: oklch(0.70 0.16 268);
-  --primary-foreground: oklch(0.16 0.02 268);
-  --secondary: oklch(0.27 0.02 268);
-  --secondary-foreground: oklch(0.97 0.005 264);
-  --muted: oklch(0.27 0.02 268);
-  --muted-foreground: oklch(0.70 0.02 264);
-  --accent: oklch(0.30 0.03 268);
-  --accent-foreground: oklch(0.97 0.005 264);
-  --destructive: oklch(0.65 0.20 25);
-  --destructive-foreground: oklch(0.97 0 0);
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.60 0.14 268);
-  --chart-1: oklch(0.70 0.16 268);
-  --chart-2: oklch(0.72 0.15 162);
-  --chart-3: oklch(0.70 0.18 300);
-  --chart-4: oklch(0.78 0.15 80);
-  --chart-5: oklch(0.68 0.18 20);
-  --success: oklch(0.72 0.16 152);
-  --warning: oklch(0.80 0.15 80);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+}
+
+/* 主色预设（不设 data-accent 即为 shadcn 默认中性色） */
+:root[data-accent="blue"] {
+  --primary: oklch(0.55 0.22 258);
+  --primary-foreground: oklch(0.985 0 0);
+  --ring: oklch(0.62 0.19 258);
+}
+:root[data-accent="blue"].dark {
+  --primary: oklch(0.68 0.17 258);
+  --primary-foreground: oklch(0.16 0.03 258);
+  --ring: oklch(0.62 0.17 258);
+}
+:root[data-accent="violet"] {
+  --primary: oklch(0.55 0.25 293);
+  --primary-foreground: oklch(0.985 0 0);
+  --ring: oklch(0.62 0.22 293);
+}
+:root[data-accent="violet"].dark {
+  --primary: oklch(0.70 0.19 293);
+  --primary-foreground: oklch(0.16 0.03 293);
+  --ring: oklch(0.64 0.19 293);
+}
+:root[data-accent="emerald"] {
+  --primary: oklch(0.60 0.15 163);
+  --primary-foreground: oklch(0.985 0 0);
+  --ring: oklch(0.66 0.14 163);
+}
+:root[data-accent="emerald"].dark {
+  --primary: oklch(0.70 0.15 163);
+  --primary-foreground: oklch(0.16 0.03 163);
+  --ring: oklch(0.64 0.15 163);
+}
+:root[data-accent="rose"] {
+  --primary: oklch(0.58 0.22 15);
+  --primary-foreground: oklch(0.985 0 0);
+  --ring: oklch(0.64 0.19 15);
+}
+:root[data-accent="rose"].dark {
+  --primary: oklch(0.70 0.19 15);
+  --primary-foreground: oklch(0.16 0.03 15);
+  --ring: oklch(0.64 0.18 15);
+}
+:root[data-accent="amber"] {
+  --primary: oklch(0.72 0.16 72);
+  --primary-foreground: oklch(0.20 0.03 72);
+  --ring: oklch(0.76 0.15 72);
+}
+:root[data-accent="amber"].dark {
+  --primary: oklch(0.80 0.15 75);
+  --primary-foreground: oklch(0.20 0.03 72);
+  --ring: oklch(0.78 0.14 75);
+}
+:root[data-accent="orange"] {
+  --primary: oklch(0.63 0.20 45);
+  --primary-foreground: oklch(0.985 0 0);
+  --ring: oklch(0.68 0.18 45);
+}
+:root[data-accent="orange"].dark {
+  --primary: oklch(0.72 0.18 45);
+  --primary-foreground: oklch(0.18 0.03 45);
+  --ring: oklch(0.68 0.17 45);
+}
+:root[data-accent="teal"] {
+  --primary: oklch(0.60 0.12 190);
+  --primary-foreground: oklch(0.985 0 0);
+  --ring: oklch(0.66 0.11 190);
+}
+:root[data-accent="teal"].dark {
+  --primary: oklch(0.70 0.12 190);
+  --primary-foreground: oklch(0.16 0.03 190);
+  --ring: oklch(0.64 0.12 190);
 }
 
 @layer base {
@@ -103,26 +168,20 @@
   }
   body {
     @apply bg-background text-foreground antialiased;
-    background-image: var(
-      --theme-bg-image,
-      radial-gradient(
-        900px 380px at 50% -140px,
-        color-mix(in oklab, var(--primary) 12%, transparent),
-        transparent
-      )
-    );
-    background-repeat: no-repeat;
+    background-image: var(--theme-bg-image, none);
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
   }
-  /* 卡片半透明 + 毛玻璃；有背景图时呈现 glassmorphism */
+  /* 卡片透明度可控：--card-opacity 由主题设置写入（1=不透明） */
   [data-slot="card"] {
-    background-color: color-mix(in oklab, var(--card) 80%, transparent);
-    backdrop-filter: blur(14px) saturate(1.15);
+    background-color: color-mix(
+      in oklab,
+      var(--card) calc(var(--card-opacity) * 100%),
+      transparent
+    );
   }
-  html.no-glass [data-slot="card"] {
-    background-color: var(--card);
-    backdrop-filter: none;
+  html[data-glass="true"] [data-slot="card"] {
+    backdrop-filter: blur(14px) saturate(1.15);
   }
 }

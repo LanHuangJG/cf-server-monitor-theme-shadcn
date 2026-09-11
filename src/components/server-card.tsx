@@ -50,7 +50,7 @@ function Flag({ region }: { region?: string }) {
 
 const EXPIRY_TONE: Record<string, string> = {
   muted: 'text-muted-foreground',
-  warning: 'text-warning',
+  warning: 'text-amber-600 dark:text-amber-400',
   destructive: 'text-destructive',
 }
 

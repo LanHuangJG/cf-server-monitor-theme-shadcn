@@ -16,8 +16,8 @@ export function MetricBar({
     percent >= 90
       ? 'bg-destructive'
       : percent >= 75
-        ? 'bg-warning'
-        : 'bg-success'
+        ? 'bg-amber-500'
+        : 'bg-primary'
 
   return (
     <div className={cn('space-y-1.5', className)}>

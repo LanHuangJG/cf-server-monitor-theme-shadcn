@@ -45,3 +45,18 @@ export const fetchHistory = (id: string, hours: number) =>
   getJson<HistoryPoint[]>(
     `/api/history/all?id=${encodeURIComponent(id)}&hours=${hours}`
   )
+
+// 保存主题自定义配置（需登录；同源会自动带 cfsm_auth Cookie）
+export async function saveThemeOptions(
+  themeOptions: Record<string, unknown>
+): Promise<void> {
+  const res = await fetch(`${API_BASE}/api/theme_options`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'same-origin',
+    body: JSON.stringify({ theme_options: themeOptions }),
+  })
+  if (!res.ok) {
+    throw new Error(`保存失败：${res.status}`)
+  }
+}

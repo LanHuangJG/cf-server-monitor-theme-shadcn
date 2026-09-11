@@ -4,6 +4,7 @@ import * as React from 'react'
 import { Footer } from '@/components/footer'
 import { ServerCard } from '@/components/server-card'
 import { SummaryCards } from '@/components/summary-cards'
+import { ThemeSettings } from '@/components/theme-settings'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -81,6 +82,7 @@ export function Dashboard() {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          {config?.authorization && <ThemeSettings config={config} />}
           <Button variant="outline" size="icon" asChild>
             <a href="/admin#admin" aria-label="管理后台" title="管理后台">
               <Settings className="size-4" />

@@ -68,7 +68,7 @@ export function SummaryCards({
             <span
               className={cn(
                 'inline-block size-1.5 rounded-full',
-                connection ? 'bg-success' : 'bg-muted-foreground'
+                connection ? 'bg-emerald-500' : 'bg-muted-foreground'
               )}
             />
             {connection ? '实时连接中' : '实时连接已断开'}
@@ -81,7 +81,7 @@ export function SummaryCards({
           <CardTitle className="text-sm font-medium text-muted-foreground">
             实时速率
           </CardTitle>
-          <span className="flex size-7 items-center justify-center rounded-md bg-success/10 text-success">
+          <span className="flex size-7 items-center justify-center rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
             <ArrowDown className="size-4" />
           </span>
         </CardHeader>
@@ -100,7 +100,7 @@ export function SummaryCards({
           <CardTitle className="text-sm font-medium text-muted-foreground">
             累计下载
           </CardTitle>
-          <span className="flex size-7 items-center justify-center rounded-md bg-chart-3/10 text-chart-3">
+          <span className="flex size-7 items-center justify-center rounded-md bg-violet-500/10 text-violet-600 dark:text-violet-400">
             <ArrowDown className="size-4" />
           </span>
         </CardHeader>
@@ -117,7 +117,7 @@ export function SummaryCards({
           <CardTitle className="text-sm font-medium text-muted-foreground">
             累计上传
           </CardTitle>
-          <span className="flex size-7 items-center justify-center rounded-md bg-warning/15 text-warning">
+          <span className="flex size-7 items-center justify-center rounded-md bg-amber-500/15 text-amber-600 dark:text-amber-400">
             <ArrowUp className="size-4" />
           </span>
         </CardHeader>
