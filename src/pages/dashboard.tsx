@@ -101,7 +101,6 @@ export function Dashboard() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <ViewSwitcher value={view} onChange={changeView} />
           {config && <ThemeSettings config={config} />}
           <Button variant="outline" size="icon" asChild>
             <a href="/admin#admin" aria-label="管理后台" title="管理后台">
@@ -123,28 +122,35 @@ export function Dashboard() {
         loading={loading}
       />
 
-      {loading && regions.length === 0 && (
-        <div className="mt-6 flex flex-wrap gap-2">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-8 w-16 rounded-md" />
-          ))}
+      <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          {loading && regions.length === 0 ? (
+            <div className="flex gap-2">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <Skeleton key={i} className="h-9 w-16 rounded-lg" />
+              ))}
+            </div>
+          ) : regions.length > 1 ? (
+            <Tabs value={region} onValueChange={setRegion}>
+              <TabsList className="h-auto flex-wrap">
+                <TabsTrigger value="all" className="flex-none px-3">
+                  全部
+                </TabsTrigger>
+                {regions.map(([code, count]) => (
+                  <TabsTrigger
+                    key={code}
+                    value={code}
+                    className="flex-none px-3"
+                  >
+                    {code} · {count}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </Tabs>
+          ) : null}
         </div>
-      )}
-
-      {!loading && regions.length > 1 && (
-        <Tabs value={region} onValueChange={setRegion} className="mt-6">
-          <TabsList className="h-auto flex-wrap">
-            <TabsTrigger value="all" className="flex-none px-3">
-              全部
-            </TabsTrigger>
-            {regions.map(([code, count]) => (
-              <TabsTrigger key={code} value={code} className="flex-none px-3">
-                {code} · {count}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </Tabs>
-      )}
+        <ViewSwitcher value={view} onChange={changeView} />
+      </div>
 
       {error && (
         <div className="mt-6 rounded-lg border border-destructive/40 bg-destructive/5 p-4 text-sm text-destructive">
