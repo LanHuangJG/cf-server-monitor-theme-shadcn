@@ -75,6 +75,15 @@ function timeLabel(ts: number, hours: number): string {
 
 const num = (v: unknown): number | null => (typeof v === 'number' ? v : null)
 
+// 自适应小数位，避免刻度取整后重复（1.5 -> 2）
+function formatAxis(v: number): string {
+  if (!Number.isFinite(v)) return ''
+  if (Math.abs(v) >= 100) return v.toFixed(0)
+  if (Math.abs(v) < 1) return String(Number(v.toFixed(2)))
+  if (Math.abs(v) < 10) return String(Number(v.toFixed(1)))
+  return v.toFixed(0)
+}
+
 export function HistoryChart({
   history,
   hours,
@@ -221,7 +230,7 @@ export function HistoryChart({
           <ChartContainer config={config} className="aspect-auto h-full w-full">
             <AreaChart
               data={data}
-              margin={{ top: 8, right: 8, bottom: 0, left: -16 }}
+              margin={{ top: 8, right: 12, bottom: 0, left: 0 }}
             >
               <CartesianGrid vertical={false} />
               <XAxis
@@ -236,7 +245,8 @@ export function HistoryChart({
               <YAxis
                 tickLine={false}
                 axisLine={false}
-                width={64}
+                width={60}
+                tickMargin={6}
                 domain={isLatency ? ['auto', 'auto'] : isLoss ? [0, 'auto'] : undefined}
                 tickFormatter={(v: number) =>
                   isNetwork
@@ -245,7 +255,7 @@ export function HistoryChart({
                       ? `${Math.round(v)}ms`
                       : isLoss
                         ? `${Math.round(v)}%`
-                        : `${Math.round(v)}`
+                        : formatAxis(v)
                 }
               />
               <ChartTooltip
