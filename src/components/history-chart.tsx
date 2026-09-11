@@ -84,6 +84,16 @@ function formatAxis(v: number): string {
   return v.toFixed(0)
 }
 
+// 轴上用的紧凑速率（39.3 KB/s -> 39K），避免轴标签过宽被裁
+function formatSpeedAxis(v: number): string {
+  const abs = Math.abs(v)
+  if (abs < 1024) return `${Math.round(v)}B`
+  const units = ['K', 'M', 'G', 'T']
+  const i = Math.min(Math.floor(Math.log(abs) / Math.log(1024)) - 1, units.length - 1)
+  const value = v / Math.pow(1024, i + 1)
+  return `${value.toFixed(Math.abs(value) < 10 ? 1 : 0)}${units[i]}`
+}
+
 export function HistoryChart({
   history,
   hours,
@@ -245,12 +255,12 @@ export function HistoryChart({
               <YAxis
                 tickLine={false}
                 axisLine={false}
-                width={60}
+                width={64}
                 tickMargin={6}
                 domain={isLatency ? ['auto', 'auto'] : isLoss ? [0, 'auto'] : undefined}
                 tickFormatter={(v: number) =>
                   isNetwork
-                    ? formatSpeed(v)
+                    ? formatSpeedAxis(v)
                     : isLatency
                       ? `${Math.round(v)}ms`
                       : isLoss
