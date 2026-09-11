@@ -4,8 +4,8 @@ import { Footer } from '@/components/footer'
 import { ServerCard } from '@/components/server-card'
 import { SummaryCards } from '@/components/summary-cards'
 import { ThemeToggle } from '@/components/theme-toggle'
-import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useConfig } from '@/hooks/use-config'
 import { useServers } from '@/hooks/use-servers'
 import { useTheme } from '@/hooks/use-theme'
@@ -100,25 +100,18 @@ export function Dashboard() {
       )}
 
       {!loading && regions.length > 1 && (
-        <div className="mt-6 flex flex-wrap gap-2">
-          <Button
-            variant={region === 'all' ? 'secondary' : 'ghost'}
-            size="sm"
-            onClick={() => setRegion('all')}
-          >
-            全部
-          </Button>
-          {regions.map(([code, count]) => (
-            <Button
-              key={code}
-              variant={region === code ? 'secondary' : 'ghost'}
-              size="sm"
-              onClick={() => setRegion(code)}
-            >
-              {code} · {count}
-            </Button>
-          ))}
-        </div>
+        <Tabs value={region} onValueChange={setRegion} className="mt-6">
+          <TabsList className="h-auto flex-wrap">
+            <TabsTrigger value="all" className="flex-none px-3">
+              全部
+            </TabsTrigger>
+            {regions.map(([code, count]) => (
+              <TabsTrigger key={code} value={code} className="flex-none px-3">
+                {code} · {count}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
       )}
 
       {error && (

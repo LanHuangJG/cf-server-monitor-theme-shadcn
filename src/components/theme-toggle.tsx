@@ -1,9 +1,21 @@
-import { Monitor, Moon, Sun } from 'lucide-react'
+import { Check, Monitor, Moon, Sun } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import type { ThemeMode } from '@/hooks/use-theme'
 
-const ORDER: ThemeMode[] = ['light', 'dark', 'system']
+const OPTIONS: { value: ThemeMode; label: string; icon: typeof Sun }[] = [
+  { value: 'light', label: '浅色', icon: Sun },
+  { value: 'dark', label: '深色', icon: Moon },
+  { value: 'system', label: '跟随系统', icon: Monitor },
+]
 
 export function ThemeToggle({
   mode,
@@ -12,20 +24,29 @@ export function ThemeToggle({
   mode: ThemeMode
   setMode: (mode: ThemeMode) => void
 }) {
-  const next = ORDER[(ORDER.indexOf(mode) + 1) % ORDER.length]
-  const Icon = mode === 'light' ? Sun : mode === 'dark' ? Moon : Monitor
-  const label =
-    mode === 'light' ? '浅色' : mode === 'dark' ? '深色' : '跟随系统'
+  const Current = OPTIONS.find((o) => o.value === mode)?.icon ?? Monitor
 
   return (
-    <Button
-      variant="outline"
-      size="icon"
-      title={`外观：${label}（点击切换）`}
-      aria-label={`外观：${label}（点击切换）`}
-      onClick={() => setMode(next)}
-    >
-      <Icon className="size-4" />
-    </Button>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" size="icon" aria-label="切换外观">
+          <Current className="size-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-36">
+        <DropdownMenuLabel>外观</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        {OPTIONS.map((option) => (
+          <DropdownMenuItem
+            key={option.value}
+            onClick={() => setMode(option.value)}
+          >
+            <option.icon className="size-4" />
+            {option.label}
+            {mode === option.value && <Check className="ml-auto size-4" />}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
