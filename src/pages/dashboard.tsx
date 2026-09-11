@@ -61,10 +61,11 @@ export function Dashboard() {
     [sorted, region]
   )
 
-  const uptime = useUptime(
-    React.useMemo(() => sorted.map((s) => s.id), [sorted]),
-    24
+  const uptimeTargets = React.useMemo(
+    () => sorted.map((s) => ({ id: s.id, since: s.timestamp })),
+    [sorted]
   )
+  const uptime = useUptime(uptimeTargets, 24)
 
   const summary = React.useMemo(() => {
     const online = sorted.filter(isOnline)

@@ -2,44 +2,70 @@ import * as React from 'react'
 
 import { fetchHistory } from '@/lib/api'
 
+export type UptimeCell = 'up' | 'down' | 'unknown'
+
 export interface UptimeInfo {
-  buckets: boolean[]
-  percent: number
+  cells: UptimeCell[]
+  percent: number | null
+}
+
+export interface UptimeTarget {
+  id: string
+  /** 节点接入时间（server.timestamp）；接入前的时段记为未知而不是离线 */
+  since?: number
 }
 
 // 用历史数据估算近期在线率（按小时分桶）。未登录也允许查 24h。
-export function useUptime(ids: string[], hours = 24) {
+export function useUptime(targets: UptimeTarget[], hours = 24) {
   const [map, setMap] = React.useState<Record<string, UptimeInfo>>({})
-  const key = ids.join(',')
+  const key = targets.map((t) => `${t.id}:${t.since ?? ''}`).join(',')
 
   React.useEffect(() => {
-    const list = key ? key.split(',') : []
-    if (list.length === 0) return
+    const items: UptimeTarget[] = key
+      ? key.split(',').map((p) => {
+          const [id, since] = p.split(':')
+          return { id, since: since ? Number(since) : undefined }
+        })
+      : []
+    if (items.length === 0) return
     let cancelled = false
 
     const run = async () => {
       const results = await Promise.allSettled(
-        list.map((id) =>
-          fetchHistory(id, hours).then((rows) => [id, rows] as const)
+        items.map((item) =>
+          fetchHistory(item.id, hours).then(
+            (rows) => [item, rows] as const
+          )
         )
       )
       if (cancelled) return
       const now = Date.now()
       const span = hours * 3_600_000
       const next: Record<string, UptimeInfo> = {}
+
       for (const result of results) {
         if (result.status !== 'fulfilled') continue
-        const [id, rows] = result.value
-        const buckets = Array.from({ length: hours }, () => false)
-        for (const row of rows) {
-          const idx = Math.min(
-            hours - 1,
-            Math.max(0, Math.floor((row.timestamp - (now - span)) / 3_600_000))
+        const [item, rows] = result.value
+        const first = rows.length ? rows[0].timestamp : now
+        const since = item.since ?? first
+        const cells: UptimeCell[] = Array.from({ length: hours }, () => 'unknown')
+
+        for (let i = 0; i < hours; i += 1) {
+          const start = now - span + i * 3_600_000
+          const end = start + 3_600_000
+          if (end <= since) continue // 尚未接入
+          const hasData = rows.some(
+            (r) => r.timestamp >= start && r.timestamp < end
           )
-          buckets[idx] = true
+          cells[i] = hasData ? 'up' : 'down'
         }
-        const online = buckets.filter(Boolean).length
-        next[id] = { buckets, percent: (online / hours) * 100 }
+
+        const measured = cells.filter((c) => c !== 'unknown').length
+        const up = cells.filter((c) => c === 'up').length
+        next[item.id] = {
+          cells,
+          percent: measured > 0 ? (up / measured) * 100 : null,
+        }
       }
       setMap(next)
     }
