@@ -1,0 +1,136 @@
+import * as React from 'react'
+
+import { Footer } from '@/components/footer'
+import { ServerCard } from '@/components/server-card'
+import { SummaryCards } from '@/components/summary-cards'
+import { ThemeToggle } from '@/components/theme-toggle'
+import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
+import { useConfig } from '@/hooks/use-config'
+import { useServers } from '@/hooks/use-servers'
+import { useTheme } from '@/hooks/use-theme'
+import { isOnline } from '@/lib/format'
+
+export function Dashboard() {
+  const { config } = useConfig()
+  const { mode, setMode } = useTheme(config?.preferred_theme)
+  const { servers, regionStats, loading, error, connected } = useServers(
+    config?.frontend_ws_timeout_minutes ?? 0
+  )
+  const [region, setRegion] = React.useState('all')
+
+  const sorted = React.useMemo(
+    () =>
+      [...servers].sort(
+        (a, b) =>
+          (a.sort_order ?? 0) - (b.sort_order ?? 0) ||
+          a.name.localeCompare(b.name)
+      ),
+    [servers]
+  )
+
+  const filtered = React.useMemo(
+    () =>
+      region === 'all'
+        ? sorted
+        : sorted.filter((s) => s.region === region),
+    [sorted, region]
+  )
+
+  const summary = React.useMemo(() => {
+    const online = sorted.filter(isOnline)
+    return {
+      total: sorted.length,
+      online: online.length,
+      speedIn: online.reduce((acc, s) => acc + (s.net_in_speed ?? 0), 0),
+      speedOut: online.reduce((acc, s) => acc + (s.net_out_speed ?? 0), 0),
+      netRx: sorted.reduce((acc, s) => acc + (s.net_rx ?? 0), 0),
+      netTx: sorted.reduce((acc, s) => acc + (s.net_tx ?? 0), 0),
+    }
+  }, [sorted])
+
+  const regions = Object.entries(regionStats).sort(
+    (a, b) => b[1] - a[1]
+  )
+  const total = config?.site_title || 'Cloudflare Server Monitor'
+
+  return (
+    <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
+      <header className="mb-6 flex items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="flex size-10 items-center justify-center rounded-xl bg-primary text-primary-foreground">
+            <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="2" y="3" width="20" height="7" rx="2" />
+              <rect x="2" y="14" width="20" height="7" rx="2" />
+              <circle cx="6.5" cy="6.5" r="1" fill="currentColor" />
+              <circle cx="6.5" cy="17.5" r="1" fill="currentColor" />
+            </svg>
+          </div>
+          <div>
+            <h1 className="text-lg font-semibold leading-tight">{total}</h1>
+            <p className="text-xs text-muted-foreground">
+              由 CF-Server-Monitor 驱动
+            </p>
+          </div>
+        </div>
+        <ThemeToggle mode={mode} setMode={setMode} />
+      </header>
+
+      <SummaryCards
+        total={summary.total}
+        online={summary.online}
+        speedIn={summary.speedIn}
+        speedOut={summary.speedOut}
+        netRx={summary.netRx}
+        netTx={summary.netTx}
+        connection={connected}
+      />
+
+      {regions.length > 1 && (
+        <div className="mt-6 flex flex-wrap gap-2">
+          <Button
+            variant={region === 'all' ? 'secondary' : 'ghost'}
+            size="sm"
+            onClick={() => setRegion('all')}
+          >
+            全部
+          </Button>
+          {regions.map(([code, count]) => (
+            <Button
+              key={code}
+              variant={region === code ? 'secondary' : 'ghost'}
+              size="sm"
+              onClick={() => setRegion(code)}
+            >
+              {code} · {count}
+            </Button>
+          ))}
+        </div>
+      )}
+
+      {error && (
+        <div className="mt-6 rounded-lg border border-destructive/40 bg-destructive/5 p-4 text-sm text-destructive">
+          加载失败：{error}
+        </div>
+      )}
+
+      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {loading
+          ? Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton key={i} className="h-64 rounded-xl" />
+            ))
+          : filtered.map((server) => (
+              <ServerCard key={server.id} server={server} />
+            ))}
+      </div>
+
+      {!loading && filtered.length === 0 && !error && (
+        <div className="py-16 text-center text-sm text-muted-foreground">
+          没有可显示的节点
+        </div>
+      )}
+
+      <Footer version={config?.version} />
+    </div>
+  )
+}

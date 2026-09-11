@@ -43,11 +43,21 @@ npm install
 npm run dev
 ```
 
+开发服务器默认把 `/api`、`/flags`、`/os-icons`（含 WebSocket）代理到
+`https://status.ggaag.com`，可直接看到真实数据；用 `VITE_API_TARGET` 覆盖：
+
+```bash
+VITE_API_TARGET=https://your-cfsm.example.com npm run dev
+```
+
 构建：
 
 ```bash
 npm run build      # 产物输出到 dist/
 ```
+
+主分支 push 后，GitHub Actions 会自动构建并把 `dist/` 发布到 `build` 分支，
+供 CF-Server-Monitor 反代。
 
 ## 📐 主题规范
 

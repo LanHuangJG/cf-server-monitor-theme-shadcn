@@ -1,0 +1,193 @@
+import { ArrowLeft, Cpu, HardDrive, MemoryStick } from 'lucide-react'
+import { Link, useParams } from 'react-router-dom'
+
+import { Footer } from '@/components/footer'
+import { HistoryChart } from '@/components/history-chart'
+import { MetricBar } from '@/components/metric-bar'
+import { ThemeToggle } from '@/components/theme-toggle'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Separator } from '@/components/ui/separator'
+import { Skeleton } from '@/components/ui/skeleton'
+import { useConfig } from '@/hooks/use-config'
+import { useServerDetail } from '@/hooks/use-server-detail'
+import { useTheme } from '@/hooks/use-theme'
+import {
+  formatBytes,
+  formatMB,
+  formatSpeed,
+  formatUptime,
+  isOnline,
+  timeAgo,
+  usedPercent,
+} from '@/lib/format'
+
+function Stat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center justify-between gap-3 text-sm">
+      <span className="text-muted-foreground">{label}</span>
+      <span className="font-medium tabular-nums">{value}</span>
+    </div>
+  )
+}
+
+export function ServerDetail() {
+  const { id } = useParams<{ id: string }>()
+  const { config } = useConfig()
+  const { mode, setMode } = useTheme(config?.preferred_theme)
+  const { server, history, hours, setHours, loading, error } = useServerDetail(
+    id,
+    1
+  )
+
+  if (!id) return null
+
+  const online = server ? isOnline(server) : false
+  const cpu = server?.cpu ?? 0
+  const ramPercent = usedPercent(server?.ram_used, server?.ram_total)
+  const diskPercent = usedPercent(server?.disk_used, server?.disk_total)
+  const swapPercent = usedPercent(server?.swap_used, server?.swap_total)
+
+  return (
+    <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
+      <header className="mb-6 flex items-center justify-between gap-4">
+        <div className="flex min-w-0 items-center gap-3">
+          <Button variant="outline" size="icon" asChild>
+            <Link to="/" aria-label="返回">
+              <ArrowLeft className="size-4" />
+            </Link>
+          </Button>
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <h1 className="truncate text-lg font-semibold leading-tight">
+                {server?.name || '加载中…'}
+              </h1>
+              {server && (
+                <Badge variant={online ? 'success' : 'destructive'}>
+                  {online ? '在线' : '离线'}
+                </Badge>
+              )}
+            </div>
+            <p className="truncate text-xs text-muted-foreground">
+              {server?.server_group || '未分组'}
+              {server?.region ? ` · ${server.region}` : ''}
+              {server ? ` · 更新于 ${timeAgo(server.last_updated)}` : ''}
+            </p>
+          </div>
+        </div>
+        <ThemeToggle mode={mode} setMode={setMode} />
+      </header>
+
+      {error && !server && (
+        <div className="rounded-lg border border-destructive/40 bg-destructive/5 p-4 text-sm text-destructive">
+          加载失败：{error}
+        </div>
+      )}
+
+      {!server ? (
+        <div className="space-y-4">
+          <Skeleton className="h-40 rounded-xl" />
+          <Skeleton className="h-72 rounded-xl" />
+        </div>
+      ) : (
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                  <Cpu className="size-4" /> 资源占用
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <MetricBar label="CPU" percent={cpu} value={`${cpu.toFixed(1)}%`} />
+                <MetricBar
+                  label={`内存（${formatMB(server.ram_used)} / ${formatMB(server.ram_total)}）`}
+                  percent={ramPercent}
+                  value={`${ramPercent.toFixed(0)}%`}
+                />
+                <MetricBar
+                  label={`磁盘（${formatMB(server.disk_used)} / ${formatMB(server.disk_total)}）`}
+                  percent={diskPercent}
+                  value={`${diskPercent.toFixed(0)}%`}
+                />
+                <MetricBar
+                  label={`Swap（${formatMB(server.swap_used)} / ${formatMB(server.swap_total)}）`}
+                  percent={swapPercent}
+                  value={`${swapPercent.toFixed(0)}%`}
+                />
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                  <HardDrive className="size-4" /> 运行状态
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2.5">
+                <Stat label="下行速率" value={formatSpeed(server.net_in_speed)} />
+                <Stat label="上行速率" value={formatSpeed(server.net_out_speed)} />
+                <Stat label="累计下载" value={formatBytes(server.net_rx)} />
+                <Stat label="累计上传" value={formatBytes(server.net_tx)} />
+                <Separator />
+                <Stat label="负载 (1/5/15)" value={server.load_avg || '-'} />
+                <Stat label="进程数" value={`${server.processes ?? '-'}`} />
+                <Stat
+                  label="TCP / UDP"
+                  value={`${server.tcp_conn ?? '-'} / ${server.udp_conn ?? '-'}`}
+                />
+                <Stat label="运行时长" value={formatUptime(server.boot_time)} />
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                <MemoryStick className="size-4" /> 系统信息
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+              <Stat label="操作系统" value={server.os || '-'} />
+              <Stat label="内核" value={server.kernel_version || '-'} />
+              <Stat label="架构" value={server.arch || '-'} />
+              <Stat
+                label="CPU"
+                value={
+                  server.cpu_info
+                    ? `${server.cpu_info}${server.cpu_cores ? ` · ${server.cpu_cores} 核` : ''}`
+                    : '-'
+                }
+              />
+              <Stat label="探针版本" value={server.agent_version || '-'} />
+              <Stat
+                label="IPv4 / IPv6"
+                value={`${server.ip_v4 ? '有' : '无'} / ${server.ip_v6 ? '有' : '无'}`}
+              />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                历史指标
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <HistoryChart
+                history={history}
+                hours={hours}
+                onHoursChange={setHours}
+                loading={loading}
+                error={error}
+              />
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      <Footer version={config?.version} />
+    </div>
+  )
+}
