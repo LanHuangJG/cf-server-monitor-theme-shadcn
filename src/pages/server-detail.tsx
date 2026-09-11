@@ -1,4 +1,4 @@
-import { ArrowLeft, Cpu, HardDrive, MemoryStick } from 'lucide-react'
+import { ArrowLeft, Cpu, HardDrive, MemoryStick, Settings } from 'lucide-react'
 import { Link, useParams } from 'react-router-dom'
 
 import { DetailSkeleton } from '@/components/detail-skeleton'
@@ -88,7 +88,14 @@ export function ServerDetail() {
             </p>
           </div>
         </div>
-        <ThemeToggle mode={mode} setMode={setMode} />
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="icon" asChild>
+            <a href="/admin#admin" aria-label="管理后台" title="管理后台">
+              <Settings className="size-4" />
+            </a>
+          </Button>
+          <ThemeToggle mode={mode} setMode={setMode} />
+        </div>
       </header>
 
       <div className="space-y-4">

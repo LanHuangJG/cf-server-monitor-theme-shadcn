@@ -1,9 +1,11 @@
+import { Settings } from 'lucide-react'
 import * as React from 'react'
 
 import { Footer } from '@/components/footer'
 import { ServerCard } from '@/components/server-card'
 import { SummaryCards } from '@/components/summary-cards'
 import { ThemeToggle } from '@/components/theme-toggle'
+import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useConfig } from '@/hooks/use-config'
@@ -77,7 +79,14 @@ export function Dashboard() {
             </p>
           </div>
         </div>
-        <ThemeToggle mode={mode} setMode={setMode} />
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="icon" asChild>
+            <a href="/admin#admin" aria-label="管理后台" title="管理后台">
+              <Settings className="size-4" />
+            </a>
+          </Button>
+          <ThemeToggle mode={mode} setMode={setMode} />
+        </div>
       </header>
 
       <SummaryCards
