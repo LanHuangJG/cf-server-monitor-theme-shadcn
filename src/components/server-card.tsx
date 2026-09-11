@@ -2,6 +2,7 @@ import * as React from 'react'
 import { Link } from 'react-router-dom'
 
 import { MetricBar } from '@/components/metric-bar'
+import { PingSparkline } from '@/components/ping-sparkline'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
@@ -87,12 +88,15 @@ export function ServerCard({
     .filter(Boolean)
 
   const nets = [
-    { key: 'ct', label: netNames.ct, value: server.ping_ct },
-    { key: 'cu', label: netNames.cu, value: server.ping_cu },
-    { key: 'cm', label: netNames.cm, value: server.ping_cm },
-    { key: 'bd', label: netNames.bd, value: server.ping_bd },
+    { key: 'ct', label: netNames.ct, value: server.ping_ct, loss: server.loss_ct },
+    { key: 'cu', label: netNames.cu, value: server.ping_cu, loss: server.loss_cu },
+    { key: 'cm', label: netNames.cm, value: server.ping_cm, loss: server.loss_cm },
+    { key: 'bd', label: netNames.bd, value: server.ping_bd, loss: server.loss_bd },
   ]
-  const hasPing = nets.some((n) => typeof n.value === 'number')
+  const hasPing = nets.some(
+    (n) => typeof n.value === 'number' || typeof n.loss === 'number'
+  )
+  const pingWindow = server.ping || []
 
   const showBilling = showPrice || showExpire
 
@@ -145,20 +149,28 @@ export function ServerCard({
           )}
 
           {showThreeNet && hasPing && (
-            <div className="grid grid-cols-4 gap-1">
-              {nets.map((n) => (
-                <div
-                  key={n.key}
-                  className="rounded-md bg-muted/50 px-1 py-1 text-center"
-                >
-                  <div className="text-[10px] text-muted-foreground">
-                    {n.label}
+            <div className="space-y-2">
+              <div className="grid grid-cols-4 gap-1">
+                {nets.map((n) => (
+                  <div
+                    key={n.key}
+                    className="rounded-md bg-muted/50 px-1 py-1 text-center"
+                  >
+                    <div className="text-[10px] text-muted-foreground">
+                      {n.label}
+                    </div>
+                    <div className="text-xs font-medium tabular-nums">
+                      {typeof n.value === 'number' ? n.value : '—'}
+                    </div>
+                    {typeof n.loss === 'number' && n.loss > 0 && (
+                      <div className="text-[10px] font-medium text-destructive">
+                        {n.loss}%
+                      </div>
+                    )}
                   </div>
-                  <div className="text-xs font-medium tabular-nums">
-                    {typeof n.value === 'number' ? n.value : '—'}
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
+              {pingWindow.length > 1 && <PingSparkline points={pingWindow} />}
             </div>
           )}
 

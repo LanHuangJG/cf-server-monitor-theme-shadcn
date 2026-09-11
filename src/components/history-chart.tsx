@@ -14,7 +14,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { formatSpeed } from '@/lib/format'
 import type { HistoryPoint } from '@/lib/types'
 
-type MetricKey = 'cpu' | 'ram' | 'network' | 'load' | 'latency'
+type MetricKey = 'cpu' | 'ram' | 'network' | 'load' | 'latency' | 'loss'
 
 const METRICS: { key: MetricKey; label: string }[] = [
   { key: 'cpu', label: 'CPU' },
@@ -22,6 +22,7 @@ const METRICS: { key: MetricKey; label: string }[] = [
   { key: 'network', label: '网络' },
   { key: 'load', label: '负载' },
   { key: 'latency', label: '三网延迟' },
+  { key: 'loss', label: '丢包' },
 ]
 
 export const RANGES = [
@@ -45,6 +46,25 @@ const DEFAULT_NET_NAMES: NetNames = {
   bd: 'BGP',
 }
 
+type NetKey = 'ct' | 'cu' | 'cm' | 'bd'
+const NETS: NetKey[] = ['ct', 'cu', 'cm', 'bd']
+const LOSS_KEY: Record<NetKey, string> = {
+  ct: 'lct',
+  cu: 'lcu',
+  cm: 'lcm',
+  bd: 'lbd',
+}
+
+function netColor(key: NetKey): string {
+  return key === 'ct'
+    ? 'var(--chart-1)'
+    : key === 'cu'
+      ? 'var(--chart-2)'
+      : key === 'cm'
+        ? 'var(--chart-4)'
+        : 'var(--chart-3)'
+}
+
 function timeLabel(ts: number, hours: number): string {
   const d = new Date(ts)
   if (hours <= 24) {
@@ -62,6 +82,7 @@ export function HistoryChart({
   loading,
   error,
   netNames = DEFAULT_NET_NAMES,
+  authorized = true,
 }: {
   history: HistoryPoint[]
   hours: number
@@ -69,8 +90,17 @@ export function HistoryChart({
   loading: boolean
   error?: string | null
   netNames?: NetNames
+  authorized?: boolean
 }) {
   const [metric, setMetric] = React.useState<MetricKey>('cpu')
+
+  // 未登录时服务端不允许查 >24h 历史
+  const ranges = authorized
+    ? RANGES
+    : RANGES.filter((r) => r.hours <= 24)
+  React.useEffect(() => {
+    if (!authorized && hours > 24) onHoursChange(24)
+  }, [authorized, hours, onHoursChange])
 
   const data = React.useMemo(
     () =>
@@ -91,6 +121,10 @@ export function HistoryChart({
           cu: num(row.ping_cu),
           cm: num(row.ping_cm),
           bd: num(row.ping_bd),
+          lct: num(row.loss_ct),
+          lcu: num(row.loss_cu),
+          lcm: num(row.loss_cm),
+          lbd: num(row.loss_bd),
         }
       }),
     [history]
@@ -98,36 +132,40 @@ export function HistoryChart({
 
   const isNetwork = metric === 'network'
   const isLatency = metric === 'latency'
+  const isLoss = metric === 'loss'
+  const isMulti = isLatency || isLoss
 
-  const latencyKeys = React.useMemo(
-    () =>
-      (['ct', 'cu', 'cm', 'bd'] as const).filter((k) =>
-        data.some((d) => d[k] !== null)
-      ),
-    [data]
-  )
+  const presentKeys = React.useMemo(() => {
+    if (isLoss) {
+      return NETS.map((n) => LOSS_KEY[n]).filter((k) =>
+        data.some((d) => d[k as keyof typeof d] !== null)
+      )
+    }
+    if (isLatency) {
+      return NETS.filter((k) => data.some((d) => d[k] !== null))
+    }
+    return []
+  }, [data, isLatency, isLoss])
 
   const config: ChartConfig = isNetwork
     ? {
         netIn: { label: '下行', color: 'var(--chart-1)' },
         netOut: { label: '上行', color: 'var(--chart-3)' },
       }
-    : isLatency
+    : isMulti
       ? Object.fromEntries(
-          latencyKeys.map((k) => [
-            k,
-            {
-              label: netNames[k],
-              color:
-                k === 'ct'
-                  ? 'var(--chart-1)'
-                  : k === 'cu'
-                    ? 'var(--chart-2)'
-                    : k === 'cm'
-                      ? 'var(--chart-4)'
-                      : 'var(--chart-3)',
-            },
-          ])
+          presentKeys.map((k) => {
+            const net = (isLoss
+              ? (Object.entries(LOSS_KEY).find(([, v]) => v === k)?.[0] as NetKey)
+              : (k as NetKey)) as NetKey
+            return [
+              k,
+              {
+                label: netNames[net],
+                color: netColor(net),
+              },
+            ]
+          })
         )
       : {
           [metric]: {
@@ -136,11 +174,13 @@ export function HistoryChart({
           },
         }
 
+  const hasSeries = !isMulti || presentKeys.length > 0
+
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Tabs value={metric} onValueChange={(v) => setMetric(v as MetricKey)}>
-          <TabsList>
+          <TabsList className="h-auto flex-wrap">
             {METRICS.map((m) => (
               <TabsTrigger key={m.key} value={m.key}>
                 {m.label}
@@ -153,7 +193,7 @@ export function HistoryChart({
           onValueChange={(v) => onHoursChange(Number(v))}
         >
           <TabsList>
-            {RANGES.map((r) => (
+            {ranges.map((r) => (
               <TabsTrigger key={r.hours} value={String(r.hours)}>
                 {r.label}
               </TabsTrigger>
@@ -173,9 +213,9 @@ export function HistoryChart({
           <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
             暂无历史数据
           </div>
-        ) : isLatency && latencyKeys.length === 0 ? (
+        ) : !hasSeries ? (
           <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
-            暂无延迟数据
+            暂无数据
           </div>
         ) : (
           <ChartContainer config={config} className="aspect-auto h-full w-full">
@@ -197,14 +237,16 @@ export function HistoryChart({
                 tickLine={false}
                 axisLine={false}
                 width={64}
+                domain={isLatency ? ['auto', 'auto'] : isLoss ? [0, 'auto'] : undefined}
                 tickFormatter={(v: number) =>
                   isNetwork
                     ? formatSpeed(v)
                     : isLatency
                       ? `${Math.round(v)}ms`
-                      : `${Math.round(v)}`
+                      : isLoss
+                        ? `${Math.round(v)}%`
+                        : `${Math.round(v)}`
                 }
-                domain={isLatency ? ['auto', 'auto'] : undefined}
               />
               <ChartTooltip
                 cursor={false}
@@ -219,7 +261,9 @@ export function HistoryChart({
                         ? formatSpeed(Number(value))
                         : isLatency
                           ? `${Number(value).toFixed(1)} ms`
-                          : `${Number(value).toFixed(1)}${metric === 'cpu' || metric === 'ram' ? '%' : ''}`
+                          : isLoss
+                            ? `${Number(value).toFixed(1)}%`
+                            : `${Number(value).toFixed(1)}${metric === 'cpu' || metric === 'ram' ? '%' : ''}`
                     }
                   />
                 }
@@ -245,9 +289,9 @@ export function HistoryChart({
                     isAnimationActive={false}
                   />
                 </>
-              ) : isLatency ? (
+              ) : isMulti ? (
                 <>
-                  {latencyKeys.map((key) => (
+                  {presentKeys.map((key) => (
                     <Area
                       key={key}
                       type="monotone"
@@ -272,7 +316,7 @@ export function HistoryChart({
                   isAnimationActive={false}
                 />
               )}
-              {(isNetwork || isLatency) && (
+              {(isNetwork || isMulti) && (
                 <ChartLegend content={<ChartLegendContent />} />
               )}
             </AreaChart>

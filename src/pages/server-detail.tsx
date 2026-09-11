@@ -282,6 +282,7 @@ export function ServerDetail() {
               onHoursChange={setHours}
               loading={loading}
               error={error}
+              authorized={config?.authorization}
               netNames={{
                 ct: config?.custom_ct_name || '电信',
                 cu: config?.custom_cu_name || '联通',
