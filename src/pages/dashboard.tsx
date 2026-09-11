@@ -4,7 +4,7 @@ import * as React from 'react'
 import { Footer } from '@/components/footer'
 import { ServerCard } from '@/components/server-card'
 import { ServerTable } from '@/components/server-table'
-import { SummaryCards } from '@/components/summary-cards'
+import { SummaryBar } from '@/components/summary-bar'
 import { ThemeSettings } from '@/components/theme-settings'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { ViewSwitcher, type ViewMode } from '@/components/view-switcher'
@@ -68,6 +68,7 @@ export function Dashboard() {
 
   const summary = React.useMemo(() => {
     const online = sorted.filter(isOnline)
+    const cpuSum = online.reduce((acc, s) => acc + (s.cpu ?? 0), 0)
     return {
       total: sorted.length,
       online: online.length,
@@ -75,6 +76,7 @@ export function Dashboard() {
       speedOut: online.reduce((acc, s) => acc + (s.net_out_speed ?? 0), 0),
       netRx: sorted.reduce((acc, s) => acc + (s.net_rx ?? 0), 0),
       netTx: sorted.reduce((acc, s) => acc + (s.net_tx ?? 0), 0),
+      avgCpu: online.length ? cpuSum / online.length : 0,
     }
   }, [sorted])
 
@@ -117,13 +119,14 @@ export function Dashboard() {
         </div>
       </header>
 
-      <SummaryCards
+      <SummaryBar
         total={summary.total}
         online={summary.online}
         speedIn={summary.speedIn}
         speedOut={summary.speedOut}
         netRx={summary.netRx}
         netTx={summary.netTx}
+        avgCpu={summary.avgCpu}
         connection={connection}
         loading={loading}
       />
