@@ -94,7 +94,7 @@ function formatSpeedAxis(v: number): string {
   return `${value.toFixed(Math.abs(value) < 10 ? 1 : 0)}${units[i]}`
 }
 
-export function HistoryChart({
+function HistoryChartBase({
   history,
   hours,
   onHoursChange,
@@ -446,3 +446,5 @@ export function HistoryChart({
     </div>
   )
 }
+
+export const HistoryChart = React.memo(HistoryChartBase)
