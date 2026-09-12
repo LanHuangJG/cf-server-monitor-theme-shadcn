@@ -6,7 +6,6 @@ import { ServerCard } from '@/components/server-card'
 import { SummaryBar } from '@/components/summary-bar'
 import { SettingsSheetLazy } from '@/components/settings-sheet-lazy'
 import { ServerTableLazy } from '@/components/server-table-lazy'
-import { ThemeToggle } from '@/components/theme-toggle'
 import { ViewSwitcher, type ViewMode } from '@/components/view-switcher'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -118,10 +117,6 @@ export function Dashboard() {
               <Settings className="size-4" />
             </a>
           </Button>
-          <ThemeToggle
-            mode={prefs.mode}
-            setMode={(m) => setPref('mode', m)}
-          />
         </div>
       </header>
 

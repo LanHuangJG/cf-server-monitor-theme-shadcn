@@ -12,6 +12,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet'
 import { Input } from '@/components/ui/input'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { Slider } from '@/components/ui/slider'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useApp } from '@/hooks/use-app'
@@ -123,7 +124,8 @@ export function SettingsSheet() {
           </SheetDescription>
         </SheetHeader>
 
-        <div className="flex-1 space-y-0 overflow-y-auto py-2">
+        <ScrollArea className="flex-1">
+          <div className="space-y-0 py-2">
           <Section title="外观">
             <Tabs
               value={prefs.mode}
@@ -241,7 +243,7 @@ export function SettingsSheet() {
                 <span className="tabular-nums">{prefs.cardOpacity}%</span>
               </div>
               <Slider
-                min={20}
+                min={60}
                 max={100}
                 step={5}
                 value={[prefs.cardOpacity]}
@@ -275,7 +277,8 @@ export function SettingsSheet() {
               </Tabs>
             </div>
           </Section>
-        </div>
+          </div>
+        </ScrollArea>
 
         <SheetFooter className="border-t">
           {message && (

@@ -16,10 +16,10 @@ import { HistoryChart } from '@/components/history-chart'
 import { MetricBar } from '@/components/metric-bar'
 import { OsIcon } from '@/components/os-icon'
 import { SettingsSheetLazy } from '@/components/settings-sheet-lazy'
-import { ThemeToggle } from '@/components/theme-toggle'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import { useApp } from '@/hooks/use-app'
 import { useServerDetail } from '@/hooks/use-server-detail'
@@ -51,7 +51,7 @@ function Stat({ label, value }: { label: string; value: string }) {
 
 export function ServerDetail() {
   const { id } = useParams<{ id: string }>()
-  const { config, prefs, setPref } = useApp()
+  const { config } = useApp()
   const { server, history, hours, setHours, loading, error } = useServerDetail(
     id,
     1
@@ -148,10 +148,6 @@ export function ServerDetail() {
               <Settings className="size-4" />
             </a>
           </Button>
-          <ThemeToggle
-            mode={prefs.mode}
-            setMode={(m) => setPref('mode', m)}
-          />
         </div>
       </header>
 
@@ -330,7 +326,8 @@ export function ServerDetail() {
                 当前时间范围无断线 / 上报中断
               </p>
             ) : (
-              <div className="space-y-2">
+              <ScrollArea className="max-h-72">
+                <div className="space-y-2 pr-1">
                 {outages.map((o, i) => (
                   <div
                     key={i}
@@ -351,7 +348,8 @@ export function ServerDetail() {
                     </span>
                   </div>
                 ))}
-              </div>
+                </div>
+              </ScrollArea>
             )}
             <p className="mt-2 text-[11px] text-muted-foreground">
               按历史采样空档估算，阈值随采样间隔自适应
