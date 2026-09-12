@@ -1,4 +1,4 @@
-import { Settings } from 'lucide-react'
+import { Activity, Megaphone, Settings, X } from 'lucide-react'
 import * as React from 'react'
 
 import { Footer } from '@/components/footer'
@@ -23,6 +23,8 @@ export function Dashboard() {
   const [status, setStatus] = React.useState<
     'all' | 'online' | 'offline' | 'abnormal'
   >('all')
+  const [query, setQuery] = React.useState('')
+  const [announcementClosed, setAnnouncementClosed] = React.useState(false)
   const view = prefs.view
   const changeView = (next: ViewMode) => setPref('view', next)
 
@@ -43,8 +45,16 @@ export function Dashboard() {
     else if (status === 'abnormal') {
       list = list.filter((s) => !isOnline(s) || hasPacketLoss(s))
     }
+    const q = query.trim().toLowerCase()
+    if (q) {
+      list = list.filter((s) =>
+        [s.name, s.server_group, s.os, s.region, s.tags, s.cpu_info]
+          .filter(Boolean)
+          .some((v) => String(v).toLowerCase().includes(q))
+      )
+    }
     return list
-  }, [sorted, region, status])
+  }, [sorted, region, status, query])
 
   const summary = React.useMemo(() => {
     const online = sorted.filter(isOnline)
@@ -89,6 +99,11 @@ export function Dashboard() {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <Button variant="outline" size="icon" asChild>
+            <a href="#/status" aria-label="状态总览" title="状态总览">
+              <Activity className="size-4" />
+            </a>
+          </Button>
           <SettingsSheet />
           <Button variant="outline" size="icon" asChild>
             <a href="/admin#admin" aria-label="管理后台" title="管理后台">
@@ -113,6 +128,25 @@ export function Dashboard() {
         connection={connection}
         loading={loading}
       />
+
+      {typeof config?.theme_options?.announcement === 'string' &&
+        config.theme_options.announcement.trim() &&
+        !announcementClosed && (
+          <div className="mt-4 flex items-start gap-2 rounded-xl border bg-card px-4 py-3 text-sm">
+            <Megaphone className="mt-0.5 size-4 shrink-0 text-primary" />
+            <div className="flex-1 whitespace-pre-wrap">
+              {config.theme_options.announcement}
+            </div>
+            <button
+              type="button"
+              onClick={() => setAnnouncementClosed(true)}
+              aria-label="关闭公告"
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <X className="size-4" />
+            </button>
+          </div>
+        )}
 
       <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-3">
@@ -162,7 +196,15 @@ export function Dashboard() {
             </Tabs>
           ) : null}
         </div>
-        <ViewSwitcher value={view} onChange={changeView} />
+        <div className="flex items-center gap-2">
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="搜索节点…"
+            className="h-9 w-40 rounded-lg border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+          />
+          <ViewSwitcher value={view} onChange={changeView} />
+        </div>
       </div>
 
       {error && (

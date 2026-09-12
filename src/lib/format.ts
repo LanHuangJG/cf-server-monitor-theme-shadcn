@@ -142,10 +142,10 @@ export function formatTrafficPercent(percent: number): string {
 }
 
 export function hasPacketLoss(server: {
-  loss_ct?: number | boolean
-  loss_cu?: number | boolean
-  loss_cm?: number | boolean
-  loss_bd?: number | boolean
+  loss_ct?: number | boolean | null
+  loss_cu?: number | boolean | null
+  loss_cm?: number | boolean | null
+  loss_bd?: number | boolean | null
 }): boolean {
   return [server.loss_ct, server.loss_cu, server.loss_cm, server.loss_bd].some(
     (v) => typeof v === 'number' && v > 0

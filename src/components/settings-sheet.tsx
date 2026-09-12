@@ -13,6 +13,13 @@ import {
 } from '@/components/ui/sheet'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useApp } from '@/hooks/use-app'
+import {
+  fileToCompressedDataUrl,
+  LOCAL_BG,
+  loadLocalBg,
+  removeLocalBg,
+  saveLocalBg,
+} from '@/lib/local-bg'
 import type {
   BgPattern,
   CardStyle,
@@ -52,6 +59,37 @@ export function SettingsSheet() {
   const [bgUrl, setBgUrl] = React.useState(prefs.bg)
   const [message, setMessage] = React.useState<string | null>(null)
   const [saving, setSaving] = React.useState(false)
+  const [localPreview, setLocalPreview] = React.useState<string | null>(null)
+
+  React.useEffect(() => {
+    if (prefs.bg === LOCAL_BG) {
+      loadLocalBg().then((d) => setLocalPreview(d || null))
+    } else {
+      setLocalPreview(null)
+    }
+  }, [prefs.bg])
+
+  const onPickFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    try {
+      const dataUrl = await fileToCompressedDataUrl(file)
+      await saveLocalBg(dataUrl)
+      setLocalPreview(dataUrl)
+      setBgUrl('')
+      setPref('bg', LOCAL_BG)
+      setMessage('已应用本地背景图（仅本机）')
+    } catch (err) {
+      setMessage((err as Error).message)
+    }
+  }
+
+  const onClearLocal = async () => {
+    await removeLocalBg()
+    setLocalPreview(null)
+    setPref('bg', '')
+  }
 
   React.useEffect(() => setBgUrl(prefs.bg), [prefs.bg])
 
@@ -146,6 +184,29 @@ export function SettingsSheet() {
               placeholder="背景图 URL（回车应用）"
               className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
             />
+            <div className="flex items-center gap-2">
+              <label className="cursor-pointer rounded-md border px-3 py-1.5 text-xs hover:bg-accent">
+                本地上传
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={onPickFile}
+                />
+              </label>
+              {prefs.bg === LOCAL_BG && (
+                <Button variant="ghost" size="sm" onClick={onClearLocal}>
+                  清除本地图
+                </Button>
+              )}
+              {localPreview && (
+                <img
+                  src={localPreview}
+                  alt="本地背景预览"
+                  className="h-8 w-12 rounded-[3px] border object-cover"
+                />
+              )}
+            </div>
           </Section>
 
           <Section title="布局">

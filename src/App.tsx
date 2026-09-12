@@ -15,6 +15,10 @@ const ServerDetail = lazy(() =>
   import('@/pages/server-detail').then((m) => ({ default: m.ServerDetail }))
 )
 
+const StatusPage = lazy(() =>
+  import('@/pages/status').then((m) => ({ default: m.StatusPage }))
+)
+
 function ScrollManager() {
   const { pathname } = useLocation()
   const navType = useNavigationType()
@@ -64,6 +68,14 @@ export default function App() {
         <div className="min-h-svh bg-background">
           <Routes>
             <Route path="/" element={<Dashboard />} />
+            <Route
+              path="/status"
+              element={
+                <Suspense fallback={<DetailSkeleton />}>
+                  <StatusPage />
+                </Suspense>
+              }
+            />
             <Route
               path="/server/:id"
               element={

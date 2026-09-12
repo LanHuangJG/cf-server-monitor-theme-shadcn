@@ -1,6 +1,7 @@
 import * as React from 'react'
 
 import { fetchConfig, saveThemeOptions } from '@/lib/api'
+import { LOCAL_BG, loadLocalBg } from '@/lib/local-bg'
 import {
   DEFAULT_PREFS,
   hasStoredPreferences,
@@ -91,8 +92,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     else delete root.dataset.glass
 
     const url = prefs.bg.trim()
-    if (url) {
+    if (url && url !== LOCAL_BG) {
       root.style.setProperty('--theme-bg-image', `url("${url}")`)
+      delete root.dataset.bg
+    } else if (url === LOCAL_BG) {
+      root.style.removeProperty('--theme-bg-image')
       delete root.dataset.bg
     } else {
       root.style.removeProperty('--theme-bg-image')
@@ -100,6 +104,23 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       else delete root.dataset.bg
     }
   }, [prefs])
+
+  // 本地图片背景：从 IndexedDB 读取
+  React.useEffect(() => {
+    let cancelled = false
+    if (prefs.bg !== LOCAL_BG) return
+    loadLocalBg().then((data) => {
+      if (!cancelled && data) {
+        document.documentElement.style.setProperty(
+          '--theme-bg-image',
+          `url("${data}")`
+        )
+      }
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [prefs.bg])
 
   // 跟随系统模式
   React.useEffect(() => {
@@ -117,7 +138,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       ...existing,
       accent: prefs.accent,
       cardOpacity: prefs.cardOpacity,
-      bg: prefs.bg,
+      bg: prefs.bg === LOCAL_BG ? '' : prefs.bg,
       bgPattern: prefs.bgPattern,
       cardStyle: prefs.cardStyle,
     })
