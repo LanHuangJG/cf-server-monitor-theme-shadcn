@@ -72,6 +72,22 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     savePreferences(DEFAULT_PREFS)
   }, [])
 
+  // 本地图片背景：从 IndexedDB 读出，存进 state 供下面统一应用
+  const [localBg, setLocalBg] = React.useState<string | undefined>(undefined)
+  React.useEffect(() => {
+    let cancelled = false
+    if (prefs.bgType !== 'image' || prefs.bg !== LOCAL_BG) {
+      setLocalBg(undefined)
+      return
+    }
+    loadLocalBg().then((data) => {
+      if (!cancelled) setLocalBg(data)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [prefs.bg, prefs.bgType])
+
   // 应用到 DOM
   React.useEffect(() => {
     const root = document.documentElement
@@ -94,8 +110,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       root.style.removeProperty('--theme-bg-image')
     } else if (prefs.bgType === 'image') {
       delete root.dataset.bg
-      const url = prefs.bg.trim()
-      if (url && url !== LOCAL_BG) {
+      const url =
+        prefs.bg === LOCAL_BG ? (localBg ?? '') : prefs.bg.trim()
+      if (url) {
         root.style.setProperty('--theme-bg-image', `url("${url}")`)
       } else {
         root.style.removeProperty('--theme-bg-image')
@@ -106,27 +123,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
 
     // 毛玻璃只在有图片背景时才开（backdrop-filter 重，避免拖滑块卡顿）
-    const glass = prefs.cardOpacity < 100 && prefs.bgType === 'image'
+    const hasBgImage =
+      prefs.bgType === 'image' &&
+      (prefs.bg === LOCAL_BG ? !!localBg : !!prefs.bg.trim())
+    const glass = prefs.cardOpacity < 100 && hasBgImage
     if (glass) root.dataset.glass = 'true'
     else delete root.dataset.glass
-  }, [prefs])
-
-  // 本地图片背景：从 IndexedDB 读取
-  React.useEffect(() => {
-    let cancelled = false
-    if (prefs.bgType !== 'image' || prefs.bg !== LOCAL_BG) return
-    loadLocalBg().then((data) => {
-      if (!cancelled && data) {
-        document.documentElement.style.setProperty(
-          '--theme-bg-image',
-          `url("${data}")`
-        )
-      }
-    })
-    return () => {
-      cancelled = true
-    }
-  }, [prefs.bg, prefs.bgType])
+  }, [prefs, localBg])
 
   // 跟随系统模式
   React.useEffect(() => {
