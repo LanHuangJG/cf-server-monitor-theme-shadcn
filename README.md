@@ -16,26 +16,16 @@ CF 探针（CF-Server-Monitor）的 **React + shadcn/ui** 主题。社区主题�
 - **历史**：1h / 6h / 24h / 7d（未登录时服务端限制 ≤24h，自动降级）
 - **计费**：价格 / 周期 / 到期倒计时 / 自动续费 / 月度流量进度 / 标签
 - **筛选**：地区分组、离线排序
-- **外观**：浅色 / 深色 / 跟随系统（含头部快捷切换）、主色预设、卡片透明度（毛玻璃）、卡片样式
+- **外观**：浅色 / 深色 / 跟随系统（头部快捷切换）
 - **加载态**：统一骨架屏
 
-## 🎛️ 主题设置
+## 🎛️ 外观与站点设置
 
-右上角**调色板图标**打开侧边设置。分两层：
+主题**不带自己的设置面板**，外观走 CF-Server-Monitor 官方机制：
 
-- **个人偏好**：外观模式、主色、卡片透明度、卡片样式、默认视图。写在 `localStorage`，即时生效，无需登录，仅影响本机。
-- **站点默认**：点「设为站点默认」写回 CF-Server-Monitor 的 `theme_options`，对所有访客生效（**需先登录后台** `/admin`）。
-
-> 背景图不在主题里设置，统一用 CF-Server-Monitor 后台的「自定义背景」(`custom_bg` / `custom_bg_mobile`)；卡片调半透明并开启毛玻璃即可透出。
-
-`theme_options` 字段：
-
-| 字段 | 说明 |
-| --- | --- |
-| `accent` | 主色：`default` / `blue` / `violet` / `emerald` / `teal` / `rose` / `amber` / `orange` |
-| `cardOpacity` | 卡片透明度 60–100（100 = 不透明） |
-| `cardStyle` | 卡片样式：`default` / `shine` / `neon` |
-| `footer` | 自定义页脚文字（显示在 Powered by 上方） |
+- **背景图**：后台「外观设置」的 `custom_bg` / `custom_bg_mobile`（外链需加入 `csp_static` 白名单，上传图转 `data:` 直接可用）。
+- **站点默认**：后台 `theme_options`（`accent` 主色 / `cardStyle` 卡片样式 / `footer` 页脚），主题读取后对全站生效；`cardOpacity` 已不再支持（卡片始终不透明）。
+- **个人深浅色**：右上角按钮本地切换（`localStorage`，仅影响本机）。
 
 ## 🚀 作为 CF-Server-Monitor 主题使用
 

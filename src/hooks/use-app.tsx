@@ -1,8 +1,12 @@
 import * as React from 'react'
 
-import { fetchConfig, saveThemeOptions } from '@/lib/api'
+import { fetchConfig } from '@/lib/api'
 import {
-  DEFAULT_PREFS,
+  DEFAULT_EXCHANGE_RATES,
+  getDailyExchangeRates,
+  type ExchangeRates,
+} from '@/lib/finance'
+import {
   hasStoredPreferences,
   loadPreferences,
   prefsFromThemeOptions,
@@ -14,10 +18,8 @@ import type { ApiConfig } from '@/lib/types'
 interface AppContextValue {
   config: ApiConfig | null
   prefs: Preferences
+  rates: ExchangeRates
   setPref: <K extends keyof Preferences>(key: K, value: Preferences[K]) => void
-  resetPrefs: () => void
-  authorized: boolean
-  saveAsSiteDefault: () => Promise<void>
 }
 
 const AppContext = React.createContext<AppContextValue | null>(null)
@@ -25,6 +27,7 @@ const AppContext = React.createContext<AppContextValue | null>(null)
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [config, setConfig] = React.useState<ApiConfig | null>(null)
   const [prefs, setPrefs] = React.useState<Preferences>(() => loadPreferences())
+  const [rates, setRates] = React.useState<ExchangeRates>(DEFAULT_EXCHANGE_RATES)
   const hydrated = React.useRef(hasStoredPreferences())
 
   React.useEffect(() => {
@@ -32,6 +35,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     fetchConfig()
       .then((data) => {
         if (!cancelled) setConfig(data)
+      })
+      .catch(() => undefined)
+    getDailyExchangeRates()
+      .then(({ rates: next }) => {
+        if (!cancelled) setRates(next)
       })
       .catch(() => undefined)
     return () => {
@@ -66,11 +74,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     []
   )
 
-  const resetPrefs = React.useCallback(() => {
-    setPrefs({ ...DEFAULT_PREFS })
-    savePreferences(DEFAULT_PREFS)
-  }, [])
-
   // 应用到 DOM
   React.useEffect(() => {
     const root = document.documentElement
@@ -85,12 +88,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     } else {
       delete root.dataset.accent
     }
-
-    root.style.setProperty('--card-opacity', String(prefs.cardOpacity / 100))
-
-    // 卡片半透明时开启毛玻璃（背景图由 CF-SM 后台注入，主题不再自带背景）
-    if (prefs.cardOpacity < 100) root.dataset.glass = 'true'
-    else delete root.dataset.glass
   }, [prefs])
 
   // 跟随系统模式
@@ -102,24 +99,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     return () => mq.removeEventListener('change', apply)
   }, [prefs.mode])
 
-  const saveAsSiteDefault = React.useCallback(async () => {
-    if (!config?.authorization) throw new Error('请先登录后台（/admin）')
-    const existing = (config.theme_options || {}) as Record<string, unknown>
-    await saveThemeOptions({
-      ...existing,
-      accent: prefs.accent,
-      cardOpacity: prefs.cardOpacity,
-      cardStyle: prefs.cardStyle,
-    })
-  }, [config, prefs])
-
   const value: AppContextValue = {
     config,
     prefs,
+    rates,
     setPref,
-    resetPrefs,
-    authorized: !!config?.authorization,
-    saveAsSiteDefault,
   }
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>

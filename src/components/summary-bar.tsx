@@ -5,12 +5,8 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { ConnectionState } from '@/hooks/use-servers'
-import {
-  formatBytes,
-  formatResidualTotal,
-  formatSpeed,
-  type ResidualTotal,
-} from '@/lib/format'
+import { formatCNY } from '@/lib/finance'
+import { formatBytes, formatSpeed } from '@/lib/format'
 import { cn } from '@/lib/utils'
 
 function Item({
@@ -36,7 +32,7 @@ export function SummaryBar({
   netRx,
   netTx,
   avgCpu,
-  residuals,
+  remainingValueCNY,
   connection,
   loading,
 }: {
@@ -47,7 +43,7 @@ export function SummaryBar({
   netRx: number
   netTx: number
   avgCpu: number
-  residuals?: ResidualTotal[]
+  remainingValueCNY?: number
   connection: ConnectionState
   loading?: boolean
 }) {
@@ -107,19 +103,10 @@ export function SummaryBar({
 
         <Item label="平均 CPU">{avgCpu.toFixed(1)}%</Item>
 
-        {residuals && residuals.length > 0 && (
+        {remainingValueCNY != null && remainingValueCNY > 0 && (
           <>
             <div className="hidden h-4 w-px bg-border sm:block" />
-            <Item label="剩余价值">
-              {residuals.map((r, i) => (
-                <span
-                  key={r.currency}
-                  className={i > 0 ? 'ml-2 text-muted-foreground' : ''}
-                >
-                  {formatResidualTotal(r)}
-                </span>
-              ))}
-            </Item>
+            <Item label="剩余价值">{formatCNY(remainingValueCNY)}</Item>
           </>
         )}
       </CardContent>

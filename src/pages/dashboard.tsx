@@ -4,7 +4,6 @@ import * as React from 'react'
 import { Footer } from '@/components/footer'
 import { ServerCard } from '@/components/server-card'
 import { SummaryBar } from '@/components/summary-bar'
-import { SettingsSheetLazy } from '@/components/settings-sheet-lazy'
 import { ServerTableLazy } from '@/components/server-table-lazy'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { ViewSwitcher, type ViewMode } from '@/components/view-switcher'
@@ -14,10 +13,11 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useApp } from '@/hooks/use-app'
 import { useServers } from '@/hooks/use-servers'
-import { isOnline, sumResidualValue } from '@/lib/format'
+import { remainingValueCNY } from '@/lib/finance'
+import { isOnline } from '@/lib/format'
 
 export function Dashboard() {
-  const { config, prefs, setPref } = useApp()
+  const { config, prefs, rates, setPref } = useApp()
   const { servers, sysConfig, regionStats, loading, error, connection } =
     useServers(config?.frontend_ws_timeout_minutes ?? 0)
   const [region, setRegion] = React.useState('all')
@@ -86,10 +86,21 @@ export function Dashboard() {
     }
   }, [sorted])
 
-  const residuals = React.useMemo(
-    () => (showBilling ? sumResidualValue(sorted) : []),
-    [sorted, showBilling]
-  )
+  // 剩余价值（统一人民币）：总和 + 每台节点值
+  const { remainingTotal, remainingById } = React.useMemo(() => {
+    if (!showBilling) {
+      return { remainingTotal: 0, remainingById: {} as Record<string, number> }
+    }
+    const now = Date.now()
+    const byId: Record<string, number> = {}
+    let total = 0
+    for (const server of sorted) {
+      const value = remainingValueCNY(server, rates, now)
+      byId[server.id] = value
+      total += value
+    }
+    return { remainingTotal: total, remainingById: byId }
+  }, [sorted, rates, showBilling])
 
   const regions = Object.entries(regionStats).sort(
     (a, b) => b[1] - a[1]
@@ -120,7 +131,6 @@ export function Dashboard() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <SettingsSheetLazy />
           <Button variant="outline" size="icon" asChild>
             <a href="/admin#admin" aria-label="管理后台" title="管理后台">
               <Settings className="size-4" />
@@ -138,7 +148,7 @@ export function Dashboard() {
         netRx={summary.netRx}
         netTx={summary.netTx}
         avgCpu={summary.avgCpu}
-        residuals={residuals}
+        remainingValueCNY={remainingTotal}
         connection={connection}
         loading={loading}
       />
@@ -252,6 +262,7 @@ export function Dashboard() {
               showPrice={sysConfig?.show_price !== false}
               showExpire={sysConfig?.show_expire !== false}
               showValue={showBilling}
+              remainingValue={remainingById[server.id] ?? 0}
               showTraffic={sysConfig?.show_tf !== false}
               showThreeNet={sysConfig?.show_three_net_details !== false}
               netNames={netNames}

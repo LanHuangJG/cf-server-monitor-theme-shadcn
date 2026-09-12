@@ -5,7 +5,6 @@ export type CardStyle = 'default' | 'shine' | 'neon'
 export interface Preferences {
   mode: ThemeMode
   accent: string
-  cardOpacity: number
   cardStyle: CardStyle
   view: ViewMode
 }
@@ -13,7 +12,6 @@ export interface Preferences {
 export const DEFAULT_PREFS: Preferences = {
   mode: 'system',
   accent: '',
-  cardOpacity: 100,
   cardStyle: 'default',
   view: 'grid',
 }
@@ -49,9 +47,6 @@ export function prefsFromThemeOptions(
 ): Partial<Preferences> {
   const out: Partial<Preferences> = {}
   if (typeof options.accent === 'string') out.accent = options.accent
-  if (typeof options.cardOpacity === 'number') {
-    out.cardOpacity = options.cardOpacity
-  }
   if (
     options.cardStyle === 'default' ||
     options.cardStyle === 'shine' ||

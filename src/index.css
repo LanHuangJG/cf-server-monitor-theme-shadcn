@@ -61,7 +61,6 @@
 /* shadcn/ui 默认 neutral 主题 */
 :root {
   --radius: 0.625rem;
-  --card-opacity: 1;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -195,18 +194,6 @@
   }
 }
 
-/* 以下为「无层」规则：优先级高于 Tailwind 的 utilities 层，
-   否则会被 Card 的 bg-card 工具类覆盖（透明度不生效） */
-[data-slot="card"] {
-  background-color: color-mix(
-    in oklab,
-    var(--card) calc(var(--card-opacity, 1) * 100%),
-    transparent
-  );
-}
-html[data-glass="true"] [data-slot="card"] {
-  backdrop-filter: blur(10px) saturate(1.1);
-}
 /* 骨架屏：流光扫过 */
 @keyframes cfsm-shimmer {
   100% {

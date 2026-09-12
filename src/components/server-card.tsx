@@ -11,16 +11,15 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { NeonGradientCard } from '@/components/ui/neon-gradient-card'
 import { Separator } from '@/components/ui/separator'
 import { ShineBorder } from '@/components/ui/shine-border'
+import { formatCNY } from '@/lib/finance'
 import {
   formatBytes,
   formatExpiry,
   formatMB,
   formatPrice,
   formatSpeed,
-  formatResidualValue,
   formatUptime,
   isOnline,
-  residualValue,
   trafficLimitBytes,
   trafficUsedBytes,
   usedPercent,
@@ -68,6 +67,7 @@ function ServerCardBase({
   showPrice = true,
   showExpire = true,
   showValue = true,
+  remainingValue = 0,
   showTraffic = true,
   showThreeNet = false,
   variant = 'grid',
@@ -78,6 +78,7 @@ function ServerCardBase({
   showPrice?: boolean
   showExpire?: boolean
   showValue?: boolean
+  remainingValue?: number
   showTraffic?: boolean
   showThreeNet?: boolean
   variant?: 'grid' | 'ring'
@@ -95,7 +96,6 @@ function ServerCardBase({
     ? Math.min(100, (usedBytes / limitBytes) * 100)
     : 0
   const expiry = formatExpiry(server.expire_date)
-  const rv = showValue ? residualValue(server) : null
   const tags = (server.tags || '')
     .split(',')
     .map((t) => t.trim())
@@ -270,14 +270,11 @@ function ServerCardBase({
             </div>
           )}
 
-          {rv && (
+          {showValue && remainingValue > 0 && (
             <div className="flex items-center justify-between text-[11px]">
               <span className="text-muted-foreground">剩余价值</span>
               <span className="font-medium tabular-nums">
-                {formatResidualValue(rv)}
-                <span className="ml-1 text-muted-foreground">
-                  剩 {rv.percent.toFixed(0)}%
-                </span>
+                {formatCNY(remainingValue)}
               </span>
             </div>
           )}
