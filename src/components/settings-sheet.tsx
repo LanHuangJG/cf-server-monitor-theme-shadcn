@@ -198,7 +198,6 @@ export function SettingsSheet() {
                   onBlur={commitBg}
                   onKeyDown={(e) => e.key === 'Enter' && commitBg()}
                   placeholder="图片 URL（回车应用）"
-                  className="bg-background/60 backdrop-blur"
                 />
                 <div className="flex items-center gap-2">
                   <label className="cursor-pointer rounded-md border px-3 py-1.5 text-xs hover:bg-accent">

@@ -1,4 +1,4 @@
-import { Megaphone, Settings, X } from 'lucide-react'
+import { Megaphone, Search, Settings, X } from 'lucide-react'
 import * as React from 'react'
 
 import { Footer } from '@/components/footer'
@@ -201,12 +201,15 @@ export function Dashboard() {
           ) : null}
         </div>
         <div className="flex items-center gap-2">
-          <Input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="搜索节点…"
-            className="w-40 bg-background/60 backdrop-blur"
-          />
+          <div className="relative">
+            <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="搜索节点…"
+              className="w-44 pl-8"
+            />
+          </div>
           <ViewSwitcher value={view} onChange={changeView} />
         </div>
       </div>
