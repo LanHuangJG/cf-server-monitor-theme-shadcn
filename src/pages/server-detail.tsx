@@ -1,3 +1,5 @@
+import * as React from 'react'
+
 import {
   ArrowLeft,
   BadgeDollarSign,
@@ -18,6 +20,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useApp } from '@/hooks/use-app'
 import { useServerDetail } from '@/hooks/use-server-detail'
 import { computeOutages, formatDuration } from '@/lib/outages'
@@ -53,6 +56,7 @@ export function ServerDetail() {
     id,
     1
   )
+  const [lossNet, setLossNet] = React.useState<'all' | string>('all')
 
   if (!id) return null
 
@@ -97,6 +101,47 @@ export function ServerDetail() {
   const windowStart = Date.now() - hours * 3_600_000
   const from = Math.max(server.timestamp ?? 0, windowStart)
   const outages = computeOutages(history, from)
+
+  const nets = [
+    { key: 'ct', name: config?.custom_ct_name || '电信' },
+    { key: 'cu', name: config?.custom_cu_name || '联通' },
+    { key: 'cm', name: config?.custom_cm_name || '移动' },
+    { key: 'bd', name: config?.custom_bd_name || 'BGP' },
+  ] as const
+
+  const lossRecords = history
+    .map((row) => {
+      const values: Record<string, number | undefined> = {
+        ct: typeof row.loss_ct === 'number' ? row.loss_ct : undefined,
+        cu: typeof row.loss_cu === 'number' ? row.loss_cu : undefined,
+        cm: typeof row.loss_cm === 'number' ? row.loss_cm : undefined,
+        bd: typeof row.loss_bd === 'number' ? row.loss_bd : undefined,
+      }
+      const items = nets
+        .filter((n) => (values[n.key] ?? 0) > 0)
+        .map((n) => ({ key: n.key, name: n.name, loss: values[n.key] as number }))
+      return { ts: row.timestamp, items }
+    })
+    .filter((r) => r.items.length > 0)
+    .sort((a, b) => b.ts - a.ts)
+
+  const visibleLoss = lossRecords
+    .map((r) => ({
+      ts: r.ts,
+      items:
+        lossNet === 'all'
+          ? r.items
+          : r.items.filter((it) => it.key === lossNet),
+    }))
+    .filter((r) => r.items.length > 0)
+
+  const lossValues = history
+    .flatMap((r) => [r.loss_ct, r.loss_cu, r.loss_cm, r.loss_bd])
+    .filter((v): v is number => typeof v === 'number')
+  const lossMax = lossValues.length ? Math.max(...lossValues) : 0
+  const lossAvg = lossValues.length
+    ? lossValues.reduce((a, b) => a + b, 0) / lossValues.length
+    : 0
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
@@ -296,6 +341,66 @@ export function ServerDetail() {
                 bd: config?.custom_bd_name || 'BGP',
               }}
             />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              丢包记录
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Tabs value={lossNet} onValueChange={setLossNet}>
+              <TabsList className="h-auto flex-wrap">
+                <TabsTrigger value="all" className="flex-none px-3">
+                  全部
+                </TabsTrigger>
+                {nets.map((n) => (
+                  <TabsTrigger
+                    key={n.key}
+                    value={n.key}
+                    className="flex-none px-3"
+                  >
+                    {n.name}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </Tabs>
+            <div className="mt-3">
+              {visibleLoss.length === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  该时间范围无丢包
+                </p>
+              ) : (
+                <div className="max-h-72 space-y-1.5 overflow-y-auto pr-1">
+                  {visibleLoss.map((rec) => (
+                    <div
+                      key={rec.ts}
+                      className="flex items-center justify-between gap-3 text-sm"
+                    >
+                      <span className="text-muted-foreground">
+                        {new Date(rec.ts).toLocaleString('zh-CN')}
+                      </span>
+                      <span className="flex flex-wrap justify-end gap-1">
+                        {rec.items.map((it) => (
+                          <Badge
+                            key={it.key}
+                            variant={it.loss >= 10 ? 'destructive' : 'warning'}
+                          >
+                            {it.name} {it.loss}%
+                          </Badge>
+                        ))}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            <p className="mt-2 text-[11px] text-muted-foreground">
+              最大 {lossMax}% · 平均 {lossAvg.toFixed(2)}% · 采样点{' '}
+              {lossValues.length}（仅列出丢包 &gt; 0 的采样点）
+            </p>
           </CardContent>
         </Card>
 

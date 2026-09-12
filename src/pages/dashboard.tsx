@@ -1,4 +1,4 @@
-import { Activity, Megaphone, Settings, X } from 'lucide-react'
+import { Megaphone, Settings, X } from 'lucide-react'
 import * as React from 'react'
 
 import { Footer } from '@/components/footer'
@@ -13,16 +13,16 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useApp } from '@/hooks/use-app'
 import { useServers } from '@/hooks/use-servers'
-import { hasPacketLoss, isOnline } from '@/lib/format'
+import { isOnline } from '@/lib/format'
 
 export function Dashboard() {
   const { config, prefs, setPref } = useApp()
   const { servers, sysConfig, regionStats, loading, error, connection } =
     useServers(config?.frontend_ws_timeout_minutes ?? 0)
   const [region, setRegion] = React.useState('all')
-  const [status, setStatus] = React.useState<
-    'all' | 'online' | 'offline' | 'abnormal'
-  >('all')
+  const [status, setStatus] = React.useState<'all' | 'online' | 'offline'>(
+    'all'
+  )
   const [query, setQuery] = React.useState('')
   const [announcementClosed, setAnnouncementClosed] = React.useState(false)
   const view = prefs.view
@@ -42,9 +42,6 @@ export function Dashboard() {
     let list = region === 'all' ? sorted : sorted.filter((s) => s.region === region)
     if (status === 'online') list = list.filter(isOnline)
     else if (status === 'offline') list = list.filter((s) => !isOnline(s))
-    else if (status === 'abnormal') {
-      list = list.filter((s) => !isOnline(s) || hasPacketLoss(s))
-    }
     const q = query.trim().toLowerCase()
     if (q) {
       list = list.filter((s) =>
@@ -99,11 +96,6 @@ export function Dashboard() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="icon" asChild>
-            <a href="#/status" aria-label="状态总览" title="状态总览">
-              <Activity className="size-4" />
-            </a>
-          </Button>
           <SettingsSheet />
           <Button variant="outline" size="icon" asChild>
             <a href="/admin#admin" aria-label="管理后台" title="管理后台">
@@ -152,9 +144,7 @@ export function Dashboard() {
         <div className="flex flex-wrap items-center gap-3">
           <Tabs
             value={status}
-            onValueChange={(v) =>
-              setStatus(v as 'all' | 'online' | 'offline' | 'abnormal')
-            }
+            onValueChange={(v) => setStatus(v as 'all' | 'online' | 'offline')}
           >
             <TabsList>
               <TabsTrigger value="all" className="flex-none px-3">
@@ -165,9 +155,6 @@ export function Dashboard() {
               </TabsTrigger>
               <TabsTrigger value="offline" className="flex-none px-3">
                 离线
-              </TabsTrigger>
-              <TabsTrigger value="abnormal" className="flex-none px-3">
-                异常
               </TabsTrigger>
             </TabsList>
           </Tabs>
