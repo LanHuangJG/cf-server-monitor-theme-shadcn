@@ -27,8 +27,7 @@ function Item({
   )
 }
 
-const GRID =
-  'grid grid-flow-row-dense grid-cols-2 gap-x-4 gap-y-3 px-4 py-3 sm:grid-cols-3 xl:grid-cols-6'
+const GRID = 'grid grid-cols-2 gap-x-4 gap-y-3 px-4 py-3 lg:grid-cols-3'
 
 export function SummaryBar({
   total,
@@ -96,21 +95,21 @@ export function SummaryBar({
           </span>
         </Item>
 
-        <Item label="实时速率" className="col-span-2 sm:col-span-1">
+        <Item label="平均 CPU">{avgCpu.toFixed(1)}%</Item>
+
+        <Item label="实时速率" className="col-span-2 lg:col-span-1">
           <span>↓ {formatSpeed(speedIn)}</span>
           <span className="ml-2 text-muted-foreground">
             ↑ {formatSpeed(speedOut)}
           </span>
         </Item>
 
-        <Item label="累计流量" className="col-span-2 sm:col-span-1">
+        <Item label="累计流量" className="col-span-2 lg:col-span-1">
           <span>↓ {formatBytes(netRx)}</span>
           <span className="ml-2 text-muted-foreground">
             ↑ {formatBytes(netTx)}
           </span>
         </Item>
-
-        <Item label="平均 CPU">{avgCpu.toFixed(1)}%</Item>
 
         <Item label="总价值">{formatCNY(totalValueCNY ?? 0)}</Item>
 

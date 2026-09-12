@@ -1,12 +1,12 @@
 import { Megaphone, Search, Settings, X } from 'lucide-react'
 import * as React from 'react'
 
+import { DashboardSkeleton } from '@/components/dashboard-skeleton'
 import { Footer } from '@/components/footer'
-import { ServerCard, ServerCardSkeleton } from '@/components/server-card'
+import { ServerCard } from '@/components/server-card'
 import { SummaryBar } from '@/components/summary-bar'
 import { ServerTableLazy } from '@/components/server-table-lazy'
 import { SocialLinks } from '@/components/social-links'
-import { TableSkeleton } from '@/components/table-skeleton'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { ViewSwitcher, type ViewMode } from '@/components/view-switcher'
 import { Button } from '@/components/ui/button'
@@ -116,6 +116,11 @@ export function Dashboard() {
     (a, b) => b[1] - a[1]
   )
   const total = config?.site_title || 'Cloudflare Server Monitor'
+
+  // 首次加载（配置或节点未就绪且无错误）→ 整页统一骨架屏
+  if ((loading || !config) && !error) {
+    return <DashboardSkeleton view={view} />
+  }
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
@@ -250,22 +255,7 @@ export function Dashboard() {
         </div>
       )}
 
-      {loading ? (
-        view === 'table' ? (
-          <div className="mt-6">
-            <TableSkeleton />
-          </div>
-        ) : (
-          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 9 }).map((_, i) => (
-              <ServerCardSkeleton
-                key={i}
-                variant={view === 'ring' ? 'ring' : 'grid'}
-              />
-            ))}
-          </div>
-        )
-      ) : view === 'table' ? (
+      {view === 'table' ? (
         <div className="mt-6">
           <ServerTableLazy
             servers={filtered}
