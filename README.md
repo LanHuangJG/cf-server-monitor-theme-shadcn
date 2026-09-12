@@ -6,6 +6,8 @@ CF 探针（CF-Server-Monitor）的 **React + shadcn/ui** 主题。社区主题�
 
 > 状态：v1.0.0 · 可用。
 
+![preview](docs/preview.png)
+
 ## ✨ 功能
 
 - **实时**：WebSocket 推送，连接状态三态（已连接 / 连接中 / 已断开）
