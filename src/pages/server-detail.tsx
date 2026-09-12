@@ -120,7 +120,7 @@ export function ServerDetail() {
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
-      <header className="mb-6 flex items-center justify-between gap-4">
+      <header className="mb-6 flex items-center justify-between gap-4 rounded-xl border bg-card px-4 py-3 shadow-xs">
         <div className="flex min-w-0 items-center gap-3">
           <Button variant="outline" size="icon" asChild>
             <Link to="/" aria-label="返回">
@@ -129,14 +129,14 @@ export function ServerDetail() {
           </Button>
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <h1 className="overlay-text truncate text-lg font-semibold leading-tight">
+              <h1 className="truncate text-lg font-semibold leading-tight">
                 {server.name}
               </h1>
               <Badge variant={online ? 'success' : 'destructive'}>
                 {online ? '在线' : '离线'}
               </Badge>
             </div>
-            <p className="overlay-text truncate text-xs text-muted-foreground">
+            <p className="truncate text-xs text-muted-foreground">
               {server.server_group || '未分组'}
               {server.region ? ` · ${server.region}` : ''}
               {` · 更新于 ${timeAgo(server.last_updated)}`}

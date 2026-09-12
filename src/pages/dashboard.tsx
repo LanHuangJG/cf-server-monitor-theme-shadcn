@@ -109,7 +109,7 @@ export function Dashboard() {
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
-      <header className="mb-6 flex items-center justify-between gap-4">
+      <header className="mb-6 flex items-center justify-between gap-4 rounded-xl border bg-card px-4 py-3 shadow-xs">
         <div className="flex items-center gap-3">
           <div className="flex size-10 items-center justify-center rounded-xl bg-primary text-primary-foreground">
             <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -121,13 +121,13 @@ export function Dashboard() {
           </div>
           <div>
             {config ? (
-              <h1 className="overlay-text text-lg font-semibold leading-tight">
+              <h1 className="text-lg font-semibold leading-tight">
                 {total}
               </h1>
             ) : (
               <Skeleton className="h-5 w-40" />
             )}
-            <p className="overlay-text text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground">
               由 CF-Server-Monitor 驱动
             </p>
           </div>
@@ -274,7 +274,7 @@ export function Dashboard() {
       )}
 
       {!loading && filtered.length === 0 && !error && (
-        <div className="overlay-text py-16 text-center text-sm text-muted-foreground">
+        <div className="rounded-xl border bg-card py-16 text-center text-sm text-muted-foreground">
           没有可显示的节点
         </div>
       )}

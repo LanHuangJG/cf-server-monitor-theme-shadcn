@@ -219,14 +219,6 @@
   background: transparent;
 }
 
-/* 页面有背景图（CF-SM 后台注入 body）时，给直接压在背景上的文字加描边；
-   颜色跟随 --background（浅色=白晕 / 深色=黑晕），两种模式都可读 */
-html[data-has-bg='true'] .overlay-text {
-  text-shadow:
-    0 1px 3px color-mix(in oklab, var(--background) 90%, transparent),
-    0 0 7px color-mix(in oklab, var(--background) 75%, transparent);
-}
-
 /* 骨架屏：流光扫过 */
 @keyframes cfsm-shimmer {
   100% {
