@@ -244,6 +244,23 @@ export function remainingValueCNY(
   return Math.min(priceCNY, (priceCNY * diffMs) / (cycleDays * MS_PER_DAY))
 }
 
+// 所有节点原价合计（人民币，跳过「白嫖中」）
+export function sumTotalValueCNY(
+  servers: {
+    price?: string | number
+    currency?: string
+    tags?: string
+  }[],
+  rates: ExchangeRates = DEFAULT_EXCHANGE_RATES
+): number {
+  let total = 0
+  for (const server of servers) {
+    if (isFreeServer(server)) continue
+    total += serverPriceCNY(server, rates)
+  }
+  return total
+}
+
 export function sumRemainingValueCNY(
   servers: {
     price?: string | number

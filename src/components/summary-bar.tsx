@@ -1,7 +1,6 @@
 import { LoaderCircle, Wifi, WifiOff } from 'lucide-react'
 
 import { NumberTicker } from '@/components/number-ticker'
-import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { ConnectionState } from '@/hooks/use-servers'
@@ -17,12 +16,16 @@ function Item({
   children: React.ReactNode
 }) {
   return (
-    <div className="flex items-baseline gap-2">
-      <span className="text-xs text-muted-foreground">{label}</span>
-      <span className="text-sm font-semibold tabular-nums">{children}</span>
+    <div className="flex min-w-0 items-baseline gap-2">
+      <span className="shrink-0 text-xs text-muted-foreground">{label}</span>
+      <div className="min-w-0 text-sm font-semibold tabular-nums">
+        {children}
+      </div>
     </div>
   )
 }
+
+const GRID = 'grid grid-cols-2 gap-x-4 gap-y-3 px-4 py-3 sm:grid-cols-3 xl:grid-cols-6'
 
 export function SummaryBar({
   total,
@@ -32,6 +35,7 @@ export function SummaryBar({
   netRx,
   netTx,
   avgCpu,
+  totalValueCNY,
   remainingValueCNY,
   connection,
   loading,
@@ -43,6 +47,7 @@ export function SummaryBar({
   netRx: number
   netTx: number
   avgCpu: number
+  totalValueCNY?: number
   remainingValueCNY?: number
   connection: ConnectionState
   loading?: boolean
@@ -50,11 +55,11 @@ export function SummaryBar({
   if (loading) {
     return (
       <Card className="gap-0 py-0">
-        <CardContent className="flex flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3">
-          {['w-16', 'w-32', 'w-32', 'w-20', 'w-16'].map((w, i) => (
+        <CardContent className={GRID}>
+          {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="flex items-center gap-2">
               <Skeleton className="h-3 w-10" />
-              <Skeleton className={cn('h-4', w)} />
+              <Skeleton className="h-4 w-16" />
             </div>
           ))}
         </CardContent>
@@ -75,51 +80,38 @@ export function SummaryBar({
 
   return (
     <Card className="gap-0 py-0">
-      <CardContent className="flex flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3">
-        <div className="flex items-center gap-2">
-          <Item label="在线">
-            <NumberTicker value={online} />
-            <span className="text-muted-foreground"> / {total}</span>
-          </Item>
-          <span className="flex items-center gap-1 text-xs text-muted-foreground">
+      <CardContent className={GRID}>
+        <Item label="在线">
+          <NumberTicker value={online} />
+          <span className="text-muted-foreground">/ {total}</span>
+          <span className="ml-2 inline-flex items-center gap-1 text-xs font-normal text-muted-foreground">
             <conn.icon className={cn('size-3.5', conn.cls)} />
             {conn.text}
+            {offline > 0 && (
+              <span className="text-destructive">· {offline}</span>
+            )}
           </span>
-          {offline > 0 && (
-            <Badge variant="destructive" className="text-[10px]">
-              {offline} 离线
-            </Badge>
-          )}
-        </div>
-
-        <div className="hidden h-4 w-px bg-border sm:block" />
+        </Item>
 
         <Item label="实时速率">
           <span>↓ {formatSpeed(speedIn)}</span>
-          <span className="ml-2 text-muted-foreground">
+          <span className="block text-muted-foreground sm:ml-2 sm:inline">
             ↑ {formatSpeed(speedOut)}
           </span>
         </Item>
 
-        <div className="hidden h-4 w-px bg-border sm:block" />
-
         <Item label="累计流量">
           <span>↓ {formatBytes(netRx)}</span>
-          <span className="ml-2 text-muted-foreground">
+          <span className="block text-muted-foreground sm:ml-2 sm:inline">
             ↑ {formatBytes(netTx)}
           </span>
         </Item>
 
-        <div className="hidden h-4 w-px bg-border sm:block" />
-
         <Item label="平均 CPU">{avgCpu.toFixed(1)}%</Item>
 
-        {remainingValueCNY != null && remainingValueCNY > 0 && (
-          <>
-            <div className="hidden h-4 w-px bg-border sm:block" />
-            <Item label="剩余价值">{formatCNY(remainingValueCNY)}</Item>
-          </>
-        )}
+        <Item label="总价值">{formatCNY(totalValueCNY ?? 0)}</Item>
+
+        <Item label="剩余价值">{formatCNY(remainingValueCNY ?? 0)}</Item>
       </CardContent>
     </Card>
   )

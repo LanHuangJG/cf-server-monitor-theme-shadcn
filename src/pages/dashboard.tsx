@@ -15,7 +15,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useApp } from '@/hooks/use-app'
 import { useServers } from '@/hooks/use-servers'
-import { remainingValueCNY } from '@/lib/finance'
+import { remainingValueCNY, sumTotalValueCNY } from '@/lib/finance'
 import { isOnline } from '@/lib/format'
 
 export function Dashboard() {
@@ -88,10 +88,14 @@ export function Dashboard() {
     }
   }, [sorted])
 
-  // 剩余价值（统一人民币）：总和 + 每台节点值
-  const { remainingTotal, remainingById } = React.useMemo(() => {
+  // 财务（统一人民币）：总价值 + 剩余价值总和 + 每台节点剩余值
+  const { totalValue, remainingTotal, remainingById } = React.useMemo(() => {
     if (!showBilling) {
-      return { remainingTotal: 0, remainingById: {} as Record<string, number> }
+      return {
+        totalValue: 0,
+        remainingTotal: 0,
+        remainingById: {} as Record<string, number>,
+      }
     }
     const now = Date.now()
     const byId: Record<string, number> = {}
@@ -101,7 +105,11 @@ export function Dashboard() {
       byId[server.id] = value
       total += value
     }
-    return { remainingTotal: total, remainingById: byId }
+    return {
+      totalValue: sumTotalValueCNY(sorted, rates),
+      remainingTotal: total,
+      remainingById: byId,
+    }
   }, [sorted, rates, showBilling])
 
   const regions = Object.entries(regionStats).sort(
@@ -153,6 +161,7 @@ export function Dashboard() {
         netRx={summary.netRx}
         netTx={summary.netTx}
         avgCpu={summary.avgCpu}
+        totalValueCNY={totalValue}
         remainingValueCNY={remainingTotal}
         connection={connection}
         loading={loading}
