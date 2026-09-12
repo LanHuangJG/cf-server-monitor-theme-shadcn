@@ -93,6 +93,14 @@ npm run build      # 产物输出到 dist/（index.html + assets/）
 - [Magic UI](https://magicui.design/) — NumberTicker 数字滚动（零依赖等价实现）
 - 图表基于 [Recharts](https://recharts.org/) + shadcn `ChartContainer` 封装
 
+## ☕ 支持
+
+主题会持续维护。觉得好用，点个 Star / 提 issue 反馈就很好；有余力想请我喝杯咖啡也欢迎：
+
+- 爱发电：https://afdian.com/a/wenjings
+
+（主题页头也内置了爱发电按钮，可通过 `theme_options.afdian` 配置。）
+
 ## 📄 License
 
 MIT
