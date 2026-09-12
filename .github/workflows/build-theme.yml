@@ -3,12 +3,6 @@ name: Build theme
 on:
   push:
     branches: [main, master]
-    paths-ignore:
-      - 'README.md'
-      - 'SPONSORS.md'
-      - 'docs/**'
-      - 'scripts/fetch-sponsors.py'
-      - '.github/workflows/afdian-sponsors.yml'
   workflow_dispatch:
 
 permissions:
