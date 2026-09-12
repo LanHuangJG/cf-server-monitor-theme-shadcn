@@ -11,12 +11,14 @@ import { cn } from '@/lib/utils'
 function Item({
   label,
   children,
+  className,
 }: {
   label: string
   children: React.ReactNode
+  className?: string
 }) {
   return (
-    <div className="flex min-w-0 items-baseline gap-2">
+    <div className={cn('flex min-w-0 items-baseline gap-2', className)}>
       <span className="shrink-0 text-xs text-muted-foreground">{label}</span>
       <div className="min-w-0 text-sm font-semibold tabular-nums">
         {children}
@@ -25,7 +27,8 @@ function Item({
   )
 }
 
-const GRID = 'grid grid-cols-2 gap-x-4 gap-y-3 px-4 py-3 sm:grid-cols-3 xl:grid-cols-6'
+const GRID =
+  'grid grid-flow-row-dense grid-cols-2 gap-x-4 gap-y-3 px-4 py-3 sm:grid-cols-3 xl:grid-cols-6'
 
 export function SummaryBar({
   total,
@@ -93,16 +96,16 @@ export function SummaryBar({
           </span>
         </Item>
 
-        <Item label="实时速率">
+        <Item label="实时速率" className="col-span-2 sm:col-span-1">
           <span>↓ {formatSpeed(speedIn)}</span>
-          <span className="block text-muted-foreground sm:ml-2 sm:inline">
+          <span className="ml-2 text-muted-foreground">
             ↑ {formatSpeed(speedOut)}
           </span>
         </Item>
 
-        <Item label="累计流量">
+        <Item label="累计流量" className="col-span-2 sm:col-span-1">
           <span>↓ {formatBytes(netRx)}</span>
-          <span className="block text-muted-foreground sm:ml-2 sm:inline">
+          <span className="ml-2 text-muted-foreground">
             ↑ {formatBytes(netTx)}
           </span>
         </Item>
