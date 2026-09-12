@@ -83,6 +83,7 @@ export function ServerDetail() {
           </div>
           <Footer
         version={config?.version}
+        loading={!config}
         text={
           typeof config?.theme_options?.footer === 'string'
             ? config.theme_options.footer
@@ -365,6 +366,7 @@ export function ServerDetail() {
 
       <Footer
         version={config?.version}
+        loading={!config}
         text={
           typeof config?.theme_options?.footer === 'string'
             ? config.theme_options.footer

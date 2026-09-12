@@ -194,6 +194,11 @@
   }
 }
 
+/* 预留滚动条位置：弹层锁滚动（如外观下拉）时不会因滚动条消失导致页面宽度跳变 */
+html {
+  scrollbar-gutter: stable;
+}
+
 /* 统一自定义滚动条：页面 + 表格等所有原生溢出区域，样式对齐 shadcn ScrollArea */
 *:not([data-slot='scroll-area-viewport']) {
   scrollbar-width: thin;

@@ -291,6 +291,7 @@ export function Dashboard() {
 
       <Footer
         version={config?.version}
+        loading={!config}
         text={
           typeof config?.theme_options?.footer === 'string'
             ? config.theme_options.footer
