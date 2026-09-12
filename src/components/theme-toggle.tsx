@@ -27,7 +27,7 @@ export function ThemeToggle({
   const Current = OPTIONS.find((o) => o.value === mode)?.icon ?? Monitor
 
   return (
-    <DropdownMenu>
+    <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="icon" aria-label="切换外观">
           <Current className="size-4" />
