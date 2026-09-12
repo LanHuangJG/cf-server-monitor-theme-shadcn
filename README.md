@@ -28,24 +28,34 @@ CF 探针（CF-Server-Monitor）的 **React + shadcn/ui** 主题。社区主题�
 - **站点默认**：后台 `theme_options`（`accent` 主色 / `cardStyle` 卡片样式 / `footer` 页脚 / `github`、`afdian` 页头社交按钮链接），主题读取后对全站生效；卡片固定 94% 不透明，无透明度滑块。
 - **个人深浅色**：右上角按钮本地切换（`localStorage`，仅影响本机）。
 
-## 🚀 作为 CF-Server-Monitor 主题使用
+## 🚀 安装
 
-后台 → **主题商店** 选择本主题与版本；或手动在主题设置里填 `theme_url`：
+> 官方主题商店暂未上架，请用「自定义主题 URL」安装。
 
-```
-https://github.com/LanHuangJG/cf-server-monitor-theme-shadcn/tree/build
-```
+1. 打开 CF-Server-Monitor 后台（`/admin`）；
+2. 进入 **主题商店 / 外观设置**，在「主题 URL」填入：
+   ```
+   https://github.com/LanHuangJG/cf-server-monitor-theme-shadcn/tree/build
+   ```
+3. 保存后刷新页面即可。
 
-（用 `build` 分支会自动跟进；填具体 commit 可固定版本、缓存 1 天。撤销：清空 `theme_url`。）
+- 填 `build` 分支会**自动跟进**最新构建（分支缓存约 1 小时）；填具体 commit（40 位）可固定版本（缓存 24h）。
+- 撤销：清空「主题 URL」。
+- **在线预览**：https://status.ggaag.com
+- **兼容性**：建议 CF-Server-Monitor **≥ 2.8.5**（用到 `theme_options`、`preferred_theme`、`latency_window` 等字段）。
+
+> 想上架官方商店：按[主题开发文档](https://github.com/huilang-me/CF-Server-Monitor/blob/main/theme-develop.md)，把 `index.html` + `assets/` 提交到 [CFSM-Theme-Store](https://github.com/huilang-me/CFSM-Theme-Store)。本主题产物正好是 `index.html` + `assets/`，可直接提交。
 
 ## 🛠️ 本地开发
+
+需要 Node.js 20+。
 
 ```bash
 npm install
 npm run dev
 ```
 
-开发服务器默认把 `/api`、`/flags`、`/os-icons`（含 WebSocket）代理到 `https://status.ggaag.com`，可直接看到真实数据；用 `VITE_API_TARGET` 覆盖：
+开发服务器把 `/api`、`/flags`、`/os-icons`（含 WebSocket）代理到后端，默认是作者的演示实例 `https://status.ggaag.com`；请用自己的实例覆盖：
 
 ```bash
 VITE_API_TARGET=https://your-cfsm.example.com npm run dev
@@ -75,13 +85,11 @@ npm run build      # 产物输出到 dist/（index.html + assets/）
 - 页脚展示 `Powered by CF-Server-Monitor` 与版本号
 - 管理入口链接到 `/admin#admin`，不实现后台
 
-## 🙏 参考的社区注册表
+## 🙏 参考
 
-组件按 shadcn 注册表格式可复用，本主题借鉴了以下社区实现（均为零依赖等价实现，避免引入 `motion` 等大包）：
-
-- [Magic UI](https://magicui.design/) — NumberTicker 数字滚动
-- [OpenStatus](https://github.com/openstatusHQ/openstatus) — 状态页在线率色带风格
-- [Origin UI](https://originui.com/)、[ReUI](https://reui.io/)、[Tremor](https://tremor.so/) — 产品型组件与图表参考
+- [shadcn/ui](https://ui.shadcn.com/) — 设计体系与组件范式
+- [Magic UI](https://magicui.design/) — NumberTicker 数字滚动（零依赖等价实现）
+- 图表基于 [Recharts](https://recharts.org/) + shadcn `ChartContainer` 封装
 
 ## 📄 License
 
