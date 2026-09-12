@@ -20,6 +20,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { useApp } from '@/hooks/use-app'
 import { useServerDetail } from '@/hooks/use-server-detail'
+import { computeOutages, formatDuration } from '@/lib/outages'
+import { cn } from '@/lib/utils'
 import {
   formatBytes,
   formatExpiry,
@@ -91,6 +93,10 @@ export function ServerDetail() {
     .split(',')
     .map((t) => t.trim())
     .filter(Boolean)
+
+  const windowStart = Date.now() - hours * 3_600_000
+  const from = Math.max(server.timestamp ?? 0, windowStart)
+  const outages = computeOutages(history, from)
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
@@ -290,6 +296,47 @@ export function ServerDetail() {
                 bd: config?.custom_bd_name || 'BGP',
               }}
             />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              断线记录
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {outages.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                当前时间范围无断线 / 上报中断
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {outages.map((o, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center justify-between gap-3 text-sm"
+                  >
+                    <span className="flex items-center gap-2">
+                      <span
+                        className={cn(
+                          'inline-block size-2 rounded-full bg-destructive',
+                          o.ongoing && 'animate-pulse'
+                        )}
+                      />
+                      {new Date(o.start).toLocaleString('zh-CN')} —{' '}
+                      {o.ongoing ? '至今' : new Date(o.end).toLocaleString('zh-CN')}
+                    </span>
+                    <span className="shrink-0 tabular-nums text-muted-foreground">
+                      {formatDuration(o.end - o.start)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+            <p className="mt-2 text-[11px] text-muted-foreground">
+              按历史采样空档估算，阈值随采样间隔自适应
+            </p>
           </CardContent>
         </Card>
       </div>

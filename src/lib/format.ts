@@ -140,3 +140,14 @@ export function formatTrafficPercent(percent: number): string {
   if (percent < 1) return `${percent.toFixed(2)}%`
   return `${percent.toFixed(1)}%`
 }
+
+export function hasPacketLoss(server: {
+  loss_ct?: number | boolean
+  loss_cu?: number | boolean
+  loss_cm?: number | boolean
+  loss_bd?: number | boolean
+}): boolean {
+  return [server.loss_ct, server.loss_cu, server.loss_cm, server.loss_bd].some(
+    (v) => typeof v === 'number' && v > 0
+  )
+}

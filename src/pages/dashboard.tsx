@@ -13,13 +13,16 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useApp } from '@/hooks/use-app'
 import { useServers } from '@/hooks/use-servers'
-import { isOnline } from '@/lib/format'
+import { hasPacketLoss, isOnline } from '@/lib/format'
 
 export function Dashboard() {
   const { config, prefs, setPref } = useApp()
   const { servers, sysConfig, regionStats, loading, error, connection } =
     useServers(config?.frontend_ws_timeout_minutes ?? 0)
   const [region, setRegion] = React.useState('all')
+  const [status, setStatus] = React.useState<
+    'all' | 'online' | 'offline' | 'abnormal'
+  >('all')
   const view = prefs.view
   const changeView = (next: ViewMode) => setPref('view', next)
 
@@ -33,13 +36,15 @@ export function Dashboard() {
     [servers]
   )
 
-  const filtered = React.useMemo(
-    () =>
-      region === 'all'
-        ? sorted
-        : sorted.filter((s) => s.region === region),
-    [sorted, region]
-  )
+  const filtered = React.useMemo(() => {
+    let list = region === 'all' ? sorted : sorted.filter((s) => s.region === region)
+    if (status === 'online') list = list.filter(isOnline)
+    else if (status === 'offline') list = list.filter((s) => !isOnline(s))
+    else if (status === 'abnormal') {
+      list = list.filter((s) => !isOnline(s) || hasPacketLoss(s))
+    }
+    return list
+  }, [sorted, region, status])
 
   const summary = React.useMemo(() => {
     const online = sorted.filter(isOnline)
@@ -110,10 +115,31 @@ export function Dashboard() {
       />
 
       <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
-        <div>
+        <div className="flex flex-wrap items-center gap-3">
+          <Tabs
+            value={status}
+            onValueChange={(v) =>
+              setStatus(v as 'all' | 'online' | 'offline' | 'abnormal')
+            }
+          >
+            <TabsList>
+              <TabsTrigger value="all" className="flex-none px-3">
+                全部
+              </TabsTrigger>
+              <TabsTrigger value="online" className="flex-none px-3">
+                在线
+              </TabsTrigger>
+              <TabsTrigger value="offline" className="flex-none px-3">
+                离线
+              </TabsTrigger>
+              <TabsTrigger value="abnormal" className="flex-none px-3">
+                异常
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
           {loading && regions.length === 0 ? (
             <div className="flex gap-2">
-              {Array.from({ length: 4 }).map((_, i) => (
+              {Array.from({ length: 3 }).map((_, i) => (
                 <Skeleton key={i} className="h-9 w-16 rounded-lg" />
               ))}
             </div>
