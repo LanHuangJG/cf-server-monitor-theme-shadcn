@@ -207,38 +207,6 @@
 html[data-glass="true"] [data-slot="card"] {
   backdrop-filter: blur(10px) saturate(1.1);
 }
-/* 主题背景层：主题没设背景时为透明，露出 body（含后台注入的背景图） */
-#cfsm-bg {
-  background-image: var(--theme-bg-image, none);
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-html[data-bg="dots"] #cfsm-bg {
-    background-image: radial-gradient(
-      color-mix(in oklab, var(--foreground) 18%, transparent) 1px,
-      transparent 1px
-    );
-    background-size: 18px 18px;
-    background-position: 0 0;
-    background-repeat: repeat;
-  }
-  html[data-bg="grid"] #cfsm-bg {
-    background-image:
-      linear-gradient(
-        color-mix(in oklab, var(--foreground) 12%, transparent) 1px,
-        transparent 1px
-      ),
-      linear-gradient(
-        90deg,
-        color-mix(in oklab, var(--foreground) 12%, transparent) 1px,
-        transparent 1px
-      );
-    background-size: 24px 24px;
-    background-position: 0 0;
-    background-repeat: repeat;
-}
-
 /* 骨架屏：流光扫过 */
 @keyframes cfsm-shimmer {
   100% {

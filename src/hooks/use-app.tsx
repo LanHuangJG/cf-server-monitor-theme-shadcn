@@ -1,7 +1,6 @@
 import * as React from 'react'
 
 import { fetchConfig, saveThemeOptions } from '@/lib/api'
-import { LOCAL_BG, loadLocalBg } from '@/lib/local-bg'
 import {
   DEFAULT_PREFS,
   hasStoredPreferences,
@@ -72,22 +71,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     savePreferences(DEFAULT_PREFS)
   }, [])
 
-  // 本地图片背景：从 IndexedDB 读出，存进 state 供下面统一应用
-  const [localBg, setLocalBg] = React.useState<string | undefined>(undefined)
-  React.useEffect(() => {
-    let cancelled = false
-    if (prefs.bgType !== 'image' || prefs.bg !== LOCAL_BG) {
-      setLocalBg(undefined)
-      return
-    }
-    loadLocalBg().then((data) => {
-      if (!cancelled) setLocalBg(data)
-    })
-    return () => {
-      cancelled = true
-    }
-  }, [prefs.bg, prefs.bgType])
-
   // 应用到 DOM
   React.useEffect(() => {
     const root = document.documentElement
@@ -105,31 +88,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     root.style.setProperty('--card-opacity', String(prefs.cardOpacity / 100))
 
-    if (prefs.bgType === 'dots' || prefs.bgType === 'grid') {
-      root.dataset.bg = prefs.bgType
-      root.style.removeProperty('--theme-bg-image')
-    } else if (prefs.bgType === 'image') {
-      delete root.dataset.bg
-      const url =
-        prefs.bg === LOCAL_BG ? (localBg ?? '') : prefs.bg.trim()
-      if (url) {
-        root.style.setProperty('--theme-bg-image', `url("${url}")`)
-      } else {
-        root.style.removeProperty('--theme-bg-image')
-      }
-    } else {
-      delete root.dataset.bg
-      root.style.removeProperty('--theme-bg-image')
-    }
-
-    // 毛玻璃只在有图片背景时才开（backdrop-filter 重，避免拖滑块卡顿）
-    const hasBgImage =
-      prefs.bgType === 'image' &&
-      (prefs.bg === LOCAL_BG ? !!localBg : !!prefs.bg.trim())
-    const glass = prefs.cardOpacity < 100 && hasBgImage
-    if (glass) root.dataset.glass = 'true'
+    // 卡片半透明时开启毛玻璃（背景图由 CF-SM 后台注入，主题不再自带背景）
+    if (prefs.cardOpacity < 100) root.dataset.glass = 'true'
     else delete root.dataset.glass
-  }, [prefs, localBg])
+  }, [prefs])
 
   // 跟随系统模式
   React.useEffect(() => {
@@ -147,8 +109,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       ...existing,
       accent: prefs.accent,
       cardOpacity: prefs.cardOpacity,
-      bg: prefs.bg === LOCAL_BG ? '' : prefs.bg,
-      bgType: prefs.bgType,
       cardStyle: prefs.cardStyle,
     })
   }, [config, prefs])

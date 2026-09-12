@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { Globe } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 import { MetricBar } from '@/components/metric-bar'
@@ -16,8 +17,10 @@ import {
   formatMB,
   formatPrice,
   formatSpeed,
+  formatResidualValue,
   formatUptime,
   isOnline,
+  residualValue,
   trafficLimitBytes,
   trafficUsedBytes,
   usedPercent,
@@ -35,7 +38,7 @@ function flagUrl(region?: string): string | null {
 function Flag({ region }: { region?: string }) {
   const [failed, setFailed] = React.useState(false)
   const url = flagUrl(region)
-  if (!region) return <span className="text-base leading-none">🌐</span>
+  if (!region) return <Globe className="size-4 shrink-0 text-muted-foreground" />
   if (!url || failed) {
     return (
       <Badge variant="outline" className="shrink-0 text-[10px]">
@@ -64,6 +67,7 @@ function ServerCardBase({
   server,
   showPrice = true,
   showExpire = true,
+  showValue = true,
   showTraffic = true,
   showThreeNet = false,
   variant = 'grid',
@@ -73,6 +77,7 @@ function ServerCardBase({
   server: Server
   showPrice?: boolean
   showExpire?: boolean
+  showValue?: boolean
   showTraffic?: boolean
   showThreeNet?: boolean
   variant?: 'grid' | 'ring'
@@ -90,6 +95,7 @@ function ServerCardBase({
     ? Math.min(100, (usedBytes / limitBytes) * 100)
     : 0
   const expiry = formatExpiry(server.expire_date)
+  const rv = showValue ? residualValue(server) : null
   const tags = (server.tags || '')
     .split(',')
     .map((t) => t.trim())
@@ -260,6 +266,18 @@ function ServerCardBase({
               </span>
               <span className={cn('font-medium', EXPIRY_TONE[expiry.tone])}>
                 {showExpire ? expiry.text : ''}
+              </span>
+            </div>
+          )}
+
+          {rv && (
+            <div className="flex items-center justify-between text-[11px]">
+              <span className="text-muted-foreground">剩余价值</span>
+              <span className="font-medium tabular-nums">
+                {formatResidualValue(rv)}
+                <span className="ml-1 text-muted-foreground">
+                  剩 {rv.percent.toFixed(0)}%
+                </span>
               </span>
             </div>
           )}

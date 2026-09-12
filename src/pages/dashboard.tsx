@@ -6,6 +6,7 @@ import { ServerCard } from '@/components/server-card'
 import { SummaryBar } from '@/components/summary-bar'
 import { SettingsSheetLazy } from '@/components/settings-sheet-lazy'
 import { ServerTableLazy } from '@/components/server-table-lazy'
+import { ThemeToggle } from '@/components/theme-toggle'
 import { ViewSwitcher, type ViewMode } from '@/components/view-switcher'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -13,7 +14,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useApp } from '@/hooks/use-app'
 import { useServers } from '@/hooks/use-servers'
-import { isOnline } from '@/lib/format'
+import { isOnline, sumResidualValue } from '@/lib/format'
 
 export function Dashboard() {
   const { config, prefs, setPref } = useApp()
@@ -68,6 +69,9 @@ export function Dashboard() {
     ]
   )
 
+  const showBilling =
+    sysConfig?.show_price !== false && sysConfig?.show_expire !== false
+
   const summary = React.useMemo(() => {
     const online = sorted.filter(isOnline)
     const cpuSum = online.reduce((acc, s) => acc + (s.cpu ?? 0), 0)
@@ -81,6 +85,11 @@ export function Dashboard() {
       avgCpu: online.length ? cpuSum / online.length : 0,
     }
   }, [sorted])
+
+  const residuals = React.useMemo(
+    () => (showBilling ? sumResidualValue(sorted) : []),
+    [sorted, showBilling]
+  )
 
   const regions = Object.entries(regionStats).sort(
     (a, b) => b[1] - a[1]
@@ -117,6 +126,7 @@ export function Dashboard() {
               <Settings className="size-4" />
             </a>
           </Button>
+          <ThemeToggle mode={prefs.mode} setMode={(m) => setPref('mode', m)} />
         </div>
       </header>
 
@@ -128,6 +138,7 @@ export function Dashboard() {
         netRx={summary.netRx}
         netTx={summary.netTx}
         avgCpu={summary.avgCpu}
+        residuals={residuals}
         connection={connection}
         loading={loading}
       />
@@ -240,6 +251,7 @@ export function Dashboard() {
               cardStyle={prefs.cardStyle}
               showPrice={sysConfig?.show_price !== false}
               showExpire={sysConfig?.show_expire !== false}
+              showValue={showBilling}
               showTraffic={sysConfig?.show_tf !== false}
               showThreeNet={sysConfig?.show_three_net_details !== false}
               netNames={netNames}

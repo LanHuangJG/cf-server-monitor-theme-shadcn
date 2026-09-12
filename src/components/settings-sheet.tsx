@@ -11,18 +11,10 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
-import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Slider } from '@/components/ui/slider'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useApp } from '@/hooks/use-app'
-import {
-  fileToCompressedDataUrl,
-  LOCAL_BG,
-  loadLocalBg,
-  removeLocalBg,
-  saveLocalBg,
-} from '@/lib/local-bg'
 import type { CardStyle, ThemeMode, ViewMode } from '@/lib/preferences'
 import { cn } from '@/lib/utils'
 
@@ -54,47 +46,8 @@ function Section({
 
 export function SettingsSheet() {
   const { prefs, setPref, resetPrefs, authorized, saveAsSiteDefault } = useApp()
-  const [bgUrl, setBgUrl] = React.useState(prefs.bg)
   const [message, setMessage] = React.useState<string | null>(null)
   const [saving, setSaving] = React.useState(false)
-  const [localPreview, setLocalPreview] = React.useState<string | null>(null)
-
-  React.useEffect(() => {
-    if (prefs.bg === LOCAL_BG) {
-      loadLocalBg().then((d) => setLocalPreview(d || null))
-    } else {
-      setLocalPreview(null)
-    }
-  }, [prefs.bg])
-
-  const onPickFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    e.target.value = ''
-    if (!file) return
-    try {
-      const dataUrl = await fileToCompressedDataUrl(file)
-      await saveLocalBg(dataUrl)
-      setLocalPreview(dataUrl)
-      setBgUrl('')
-      setPref('bgType', 'image')
-      setPref('bg', LOCAL_BG)
-      setMessage('已应用本地背景图（仅本机）')
-    } catch (err) {
-      setMessage((err as Error).message)
-    }
-  }
-
-  const onClearLocal = async () => {
-    await removeLocalBg()
-    setLocalPreview(null)
-    setPref('bg', '')
-  }
-
-  React.useEffect(() => setBgUrl(prefs.bg), [prefs.bg])
-
-  const commitBg = () => {
-    if (bgUrl.trim() !== prefs.bg) setPref('bg', bgUrl.trim())
-  }
 
   const onSaveSite = async () => {
     setSaving(true)
@@ -162,76 +115,6 @@ export function SettingsSheet() {
                 </Button>
               ))}
             </div>
-          </Section>
-
-          <Section title="背景">
-            <Tabs
-              value={prefs.bgType}
-              onValueChange={(v) => {
-                if (v === 'image') {
-                  setPref('bgType', 'image')
-                } else {
-                  setPref('bg', '')
-                  setPref('bgType', v as 'none' | 'dots' | 'grid')
-                }
-              }}
-            >
-              <TabsList className="h-auto w-full flex-wrap">
-                <TabsTrigger value="none" className="flex-none px-3">
-                  无
-                </TabsTrigger>
-                <TabsTrigger value="dots" className="flex-none px-3">
-                  点阵
-                </TabsTrigger>
-                <TabsTrigger value="grid" className="flex-none px-3">
-                  网格
-                </TabsTrigger>
-                <TabsTrigger value="image" className="flex-none px-3">
-                  图片
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
-
-            {prefs.bgType === 'image' && (
-              <>
-                <div className="flex items-center gap-2">
-                  <Input
-                    value={bgUrl}
-                    onChange={(e) => setBgUrl(e.target.value)}
-                    onBlur={commitBg}
-                    onKeyDown={(e) => e.key === 'Enter' && commitBg()}
-                    placeholder="图片 URL"
-                    className="flex-1"
-                  />
-                  <Button size="sm" type="button" onClick={commitBg}>
-                    应用
-                  </Button>
-                </div>
-                <div className="flex items-center gap-2">
-                  <label className="cursor-pointer rounded-md border px-3 py-1.5 text-xs hover:bg-accent">
-                    本地上传
-                    <Input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={onPickFile}
-                    />
-                  </label>
-                  {prefs.bg === LOCAL_BG && (
-                    <Button variant="ghost" size="sm" onClick={onClearLocal}>
-                      清除本地图
-                    </Button>
-                  )}
-                  {localPreview && (
-                    <img
-                      src={localPreview}
-                      alt="本地背景预览"
-                      className="h-8 w-12 rounded-[3px] border object-cover"
-                    />
-                  )}
-                </div>
-              </>
-            )}
           </Section>
 
           <Section title="布局">

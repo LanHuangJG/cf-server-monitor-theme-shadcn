@@ -151,3 +151,94 @@ export function hasPacketLoss(server: {
     (v) => typeof v === 'number' && v > 0
   )
 }
+
+// 一个计费周期的大致天数，用于把价格按剩余时间折算成「剩余价值」
+const CYCLE_DAYS: Record<string, number> = {
+  month: 30,
+  quarter: 90,
+  half_year: 180,
+  year: 365,
+  two_years: 730,
+  three_years: 1095,
+  four_years: 1460,
+  five_years: 1825,
+}
+
+export interface ServerBilling {
+  price?: string | number
+  currency?: string
+  billing_cycle?: string
+  expire_date?: string
+}
+
+export interface ResidualValue {
+  value: number
+  price: number
+  currency: string
+  percent: number
+  remainingDays: number | null
+  cycleDays: number | null
+}
+
+// 剩余价值 = 价格 × 剩余天数 / 周期天数（永久机不衰减，取全价）
+export function residualValue(
+  server: ServerBilling,
+  now = Date.now()
+): ResidualValue | null {
+  const price = Number(server.price)
+  if (!server.price || Number.isNaN(price) || price <= 0) return null
+  const currency = server.currency || '¥'
+  const cycleDays = server.billing_cycle
+    ? CYCLE_DAYS[server.billing_cycle] ?? null
+    : null
+  if (!server.expire_date) {
+    return { value: price, price, currency, percent: 100, remainingDays: null, cycleDays }
+  }
+  if (!cycleDays) return null
+  const target = new Date(`${server.expire_date}T00:00:00`).getTime()
+  if (Number.isNaN(target)) return null
+  const remainingDays = Math.max(0, Math.ceil((target - now) / 86400000))
+  const percent = Math.min(100, Math.max(0, (remainingDays / cycleDays) * 100))
+  return {
+    value: (price * percent) / 100,
+    price,
+    currency,
+    percent,
+    remainingDays,
+    cycleDays,
+  }
+}
+
+function formatMoney(value: number, currency: string): string {
+  const text =
+    Math.abs(value) >= 1000
+      ? value.toLocaleString('zh-CN', { maximumFractionDigits: 2 })
+      : value.toFixed(2)
+  return `${currency}${text}`
+}
+
+export function formatResidualValue(rv: ResidualValue): string {
+  return formatMoney(rv.value, rv.currency)
+}
+
+export interface ResidualTotal {
+  currency: string
+  value: number
+}
+
+// 按币种汇总多台服务器的剩余价值（不同币种不相加）
+export function sumResidualValue(servers: ServerBilling[]): ResidualTotal[] {
+  const map = new Map<string, number>()
+  for (const server of servers) {
+    const rv = residualValue(server)
+    if (!rv) continue
+    map.set(rv.currency, (map.get(rv.currency) ?? 0) + rv.value)
+  }
+  return [...map.entries()]
+    .map(([currency, value]) => ({ currency, value }))
+    .sort((a, b) => b.value - a.value)
+}
+
+export function formatResidualTotal(total: ResidualTotal): string {
+  return formatMoney(total.value, total.currency)
+}

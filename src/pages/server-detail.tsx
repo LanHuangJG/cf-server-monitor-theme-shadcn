@@ -16,6 +16,7 @@ import { HistoryChart } from '@/components/history-chart'
 import { MetricBar } from '@/components/metric-bar'
 import { OsIcon } from '@/components/os-icon'
 import { SettingsSheetLazy } from '@/components/settings-sheet-lazy'
+import { ThemeToggle } from '@/components/theme-toggle'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -30,9 +31,11 @@ import {
   formatExpiry,
   formatMB,
   formatPrice,
+  formatResidualValue,
   formatSpeed,
   formatUptime,
   isOnline,
+  residualValue,
   timeAgo,
   formatTrafficPercent,
   trafficLimitBytes,
@@ -51,7 +54,7 @@ function Stat({ label, value }: { label: string; value: string }) {
 
 export function ServerDetail() {
   const { id } = useParams<{ id: string }>()
-  const { config } = useApp()
+  const { config, prefs, setPref } = useApp()
   const { server, history, hours, setHours, loading, error } = useServerDetail(
     id,
     1
@@ -106,6 +109,7 @@ export function ServerDetail() {
     ? Math.min(100, (usedBytes / limitBytes) * 100)
     : 0
   const expiry = formatExpiry(server.expire_date)
+  const rv = residualValue(server)
   const tags = (server.tags || '')
     .split(',')
     .map((t) => t.trim())
@@ -148,6 +152,7 @@ export function ServerDetail() {
               <Settings className="size-4" />
             </a>
           </Button>
+          <ThemeToggle mode={prefs.mode} setMode={(m) => setPref('mode', m)} />
         </div>
       </header>
 
@@ -218,6 +223,16 @@ export function ServerDetail() {
                   server.billing_cycle
                 )}
               />
+              {rv && (
+                <Stat
+                  label="剩余价值"
+                  value={`${formatResidualValue(rv)}${
+                    rv.remainingDays !== null
+                      ? `（剩 ${rv.percent.toFixed(0)}%）`
+                      : ''
+                  }`}
+                />
+              )}
               <Stat
                 label="到期"
                 value={

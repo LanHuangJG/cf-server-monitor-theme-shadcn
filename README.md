@@ -16,24 +16,25 @@ CF 探针（CF-Server-Monitor）的 **React + shadcn/ui** 主题。社区主题�
 - **历史**：1h / 6h / 24h / 7d（未登录时服务端限制 ≤24h，自动降级）
 - **计费**：价格 / 周期 / 到期倒计时 / 自动续费 / 月度流量进度 / 标签
 - **筛选**：地区分组、离线排序
-- **外观**：浅色 / 深色 / 跟随系统、主色预设、卡片透明度（毛玻璃）、背景图 / 点阵 / 网格
+- **外观**：浅色 / 深色 / 跟随系统（含头部快捷切换）、主色预设、卡片透明度（毛玻璃）、卡片样式
 - **加载态**：统一骨架屏
 
 ## 🎛️ 主题设置
 
 右上角**调色板图标**打开侧边设置。分两层：
 
-- **个人偏好**：外观模式、主色、卡片透明度、背景、默认视图。写在 `localStorage`，即时生效，无需登录，仅影响本机。
+- **个人偏好**：外观模式、主色、卡片透明度、卡片样式、默认视图。写在 `localStorage`，即时生效，无需登录，仅影响本机。
 - **站点默认**：点「设为站点默认」写回 CF-Server-Monitor 的 `theme_options`，对所有访客生效（**需先登录后台** `/admin`）。
+
+> 背景图不在主题里设置，统一用 CF-Server-Monitor 后台的「自定义背景」(`custom_bg` / `custom_bg_mobile`)；卡片调半透明并开启毛玻璃即可透出。
 
 `theme_options` 字段：
 
 | 字段 | 说明 |
 | --- | --- |
 | `accent` | 主色：`default` / `blue` / `violet` / `emerald` / `teal` / `rose` / `amber` / `orange` |
-| `cardOpacity` | 卡片透明度 20–100（100 = 不透明） |
-| `bg` | 背景图 URL |
-| `bgPattern` | 背景纹理：`` / `dots` / `grid` |
+| `cardOpacity` | 卡片透明度 60–100（100 = 不透明） |
+| `cardStyle` | 卡片样式：`default` / `shine` / `neon` |
 | `footer` | 自定义页脚文字（显示在 Powered by 上方） |
 
 ## 🚀 作为 CF-Server-Monitor 主题使用
@@ -87,7 +88,7 @@ npm run build      # 产物输出到 dist/（index.html + assets/）
 
 组件按 shadcn 注册表格式可复用，本主题借鉴了以下社区实现（均为零依赖等价实现，避免引入 `motion` 等大包）：
 
-- [Magic UI](https://magicui.design/) — NumberTicker 数字滚动、Dot/Grid 背景
+- [Magic UI](https://magicui.design/) — NumberTicker 数字滚动
 - [OpenStatus](https://github.com/openstatusHQ/openstatus) — 状态页在线率色带风格
 - [Origin UI](https://originui.com/)、[ReUI](https://reui.io/)、[Tremor](https://tremor.so/) — 产品型组件与图表参考
 
