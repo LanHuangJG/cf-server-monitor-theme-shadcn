@@ -14,6 +14,7 @@ import { DetailSkeleton } from '@/components/detail-skeleton'
 import { Footer } from '@/components/footer'
 import { HistoryChart } from '@/components/history-chart'
 import { MetricBar } from '@/components/metric-bar'
+import { OsIcon } from '@/components/os-icon'
 import { SettingsSheetLazy } from '@/components/settings-sheet-lazy'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { Badge } from '@/components/ui/badge'
@@ -273,7 +274,13 @@ export function ServerDetail() {
             </CardTitle>
           </CardHeader>
           <CardContent className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
-            <Stat label="操作系统" value={server.os || '-'} />
+            <div className="flex items-center justify-between gap-3 text-sm">
+              <span className="text-muted-foreground">操作系统</span>
+              <span className="flex items-center gap-1.5 font-medium">
+                <OsIcon os={server.os} />
+                {server.os || '-'}
+              </span>
+            </div>
             <Stat label="内核" value={server.kernel_version || '-'} />
             <Stat label="架构" value={server.arch || '-'} />
             <Stat

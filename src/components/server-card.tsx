@@ -2,6 +2,7 @@ import * as React from 'react'
 import { Link } from 'react-router-dom'
 
 import { MetricBar } from '@/components/metric-bar'
+import { OsIcon } from '@/components/os-icon'
 import { PingSparkline } from '@/components/ping-sparkline'
 import { RingGauge } from '@/components/ring-gauge'
 import { Badge } from '@/components/ui/badge'
@@ -273,9 +274,12 @@ function ServerCardBase({
             </div>
           )}
 
-          <div className="truncate text-[11px] text-muted-foreground">
-            {server.os || '-'}
-            {server.cpu_cores ? ` · ${server.cpu_cores} 核` : ''}
+          <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+            <OsIcon os={server.os} />
+            <span className="truncate">
+              {server.os || '-'}
+              {server.cpu_cores ? ` · ${server.cpu_cores} 核` : ''}
+            </span>
           </div>
         </CardContent>
       </Card>

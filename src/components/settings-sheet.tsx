@@ -192,13 +192,19 @@ export function SettingsSheet() {
 
             {prefs.bgType === 'image' && (
               <>
-                <Input
-                  value={bgUrl}
-                  onChange={(e) => setBgUrl(e.target.value)}
-                  onBlur={commitBg}
-                  onKeyDown={(e) => e.key === 'Enter' && commitBg()}
-                  placeholder="图片 URL（回车应用）"
-                />
+                <div className="flex items-center gap-2">
+                  <Input
+                    value={bgUrl}
+                    onChange={(e) => setBgUrl(e.target.value)}
+                    onBlur={commitBg}
+                    onKeyDown={(e) => e.key === 'Enter' && commitBg()}
+                    placeholder="图片 URL"
+                    className="flex-1"
+                  />
+                  <Button size="sm" type="button" onClick={commitBg}>
+                    应用
+                  </Button>
+                </div>
                 <div className="flex items-center gap-2">
                   <label className="cursor-pointer rounded-md border px-3 py-1.5 text-xs hover:bg-accent">
                     本地上传
