@@ -20,12 +20,7 @@ import {
   removeLocalBg,
   saveLocalBg,
 } from '@/lib/local-bg'
-import type {
-  BgPattern,
-  CardStyle,
-  ThemeMode,
-  ViewMode,
-} from '@/lib/preferences'
+import type { CardStyle, ThemeMode, ViewMode } from '@/lib/preferences'
 import { cn } from '@/lib/utils'
 
 const ACCENTS: { value: string; label: string; color: string }[] = [
@@ -97,6 +92,8 @@ export function SettingsSheet() {
     if (bgUrl.trim() !== prefs.bg) setPref('bg', bgUrl.trim())
   }
 
+  const bgMode = prefs.bg ? 'image' : prefs.bgPattern || 'none'
+
   const onSaveSite = async () => {
     setSaving(true)
     setMessage(null)
@@ -165,54 +162,78 @@ export function SettingsSheet() {
 
           <Section title="背景">
             <Tabs
-              value={prefs.bgPattern || 'none'}
-              onValueChange={(v) =>
-                setPref('bgPattern', (v === 'none' ? '' : v) as BgPattern)
-              }
+              value={bgMode}
+              onValueChange={(v) => {
+                if (v === 'none') {
+                  setPref('bg', '')
+                  setPref('bgPattern', '')
+                } else if (v === 'dots' || v === 'grid') {
+                  setPref('bg', '')
+                  setPref('bgPattern', v)
+                } else {
+                  setPref('bgPattern', '')
+                }
+              }}
             >
-              <TabsList className="w-full">
-                <TabsTrigger value="none">无</TabsTrigger>
-                <TabsTrigger value="dots">点阵</TabsTrigger>
-                <TabsTrigger value="grid">网格</TabsTrigger>
+              <TabsList className="h-auto w-full flex-wrap">
+                <TabsTrigger value="none" className="flex-none px-3">
+                  无
+                </TabsTrigger>
+                <TabsTrigger value="dots" className="flex-none px-3">
+                  点阵
+                </TabsTrigger>
+                <TabsTrigger value="grid" className="flex-none px-3">
+                  网格
+                </TabsTrigger>
+                <TabsTrigger value="image" className="flex-none px-3">
+                  图片
+                </TabsTrigger>
               </TabsList>
             </Tabs>
-            <input
-              value={bgUrl}
-              onChange={(e) => setBgUrl(e.target.value)}
-              onBlur={commitBg}
-              onKeyDown={(e) => e.key === 'Enter' && commitBg()}
-              placeholder="背景图 URL（回车应用）"
-              className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
-            />
-            <div className="flex items-center gap-2">
-              <label className="cursor-pointer rounded-md border px-3 py-1.5 text-xs hover:bg-accent">
-                本地上传
+
+            {bgMode === 'image' && (
+              <>
                 <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={onPickFile}
+                  value={bgUrl}
+                  onChange={(e) => setBgUrl(e.target.value)}
+                  onBlur={commitBg}
+                  onKeyDown={(e) => e.key === 'Enter' && commitBg()}
+                  placeholder="图片 URL（回车应用）"
+                  className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
                 />
-              </label>
-              {prefs.bg === LOCAL_BG && (
-                <Button variant="ghost" size="sm" onClick={onClearLocal}>
-                  清除本地图
-                </Button>
-              )}
-              {localPreview && (
-                <img
-                  src={localPreview}
-                  alt="本地背景预览"
-                  className="h-8 w-12 rounded-[3px] border object-cover"
-                />
-              )}
-            </div>
+                <div className="flex items-center gap-2">
+                  <label className="cursor-pointer rounded-md border px-3 py-1.5 text-xs hover:bg-accent">
+                    本地上传
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={onPickFile}
+                    />
+                  </label>
+                  {prefs.bg === LOCAL_BG && (
+                    <Button variant="ghost" size="sm" onClick={onClearLocal}>
+                      清除本地图
+                    </Button>
+                  )}
+                  {localPreview && (
+                    <img
+                      src={localPreview}
+                      alt="本地背景预览"
+                      className="h-8 w-12 rounded-[3px] border object-cover"
+                    />
+                  )}
+                </div>
+              </>
+            )}
           </Section>
 
           <Section title="布局">
             <div className="space-y-1">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">卡片透明度</span>
+                <span className="text-muted-foreground">
+                  卡片透明度（调低可透出背景）
+                </span>
                 <span className="tabular-nums">{prefs.cardOpacity}%</span>
               </div>
               <input

@@ -197,19 +197,21 @@
     background-position: center;
     background-attachment: fixed;
   }
-  /* 卡片透明度可控：--card-opacity 由主题设置写入（1=不透明） */
-  [data-slot="card"] {
-    background-color: color-mix(
-      in oklab,
-      var(--card) calc(var(--card-opacity) * 100%),
-      transparent
-    );
-  }
-  html[data-glass="true"] [data-slot="card"] {
-    backdrop-filter: blur(14px) saturate(1.15);
-  }
-  /* Magic UI 风格的背景纹理（主题设置可选） */
-  html[data-bg="dots"] body {
+}
+
+/* 以下为「无层」规则：优先级高于 Tailwind 的 utilities 层，
+   否则会被 Card 的 bg-card 工具类覆盖（透明度不生效） */
+[data-slot="card"] {
+  background-color: color-mix(
+    in oklab,
+    var(--card) calc(var(--card-opacity, 1) * 100%),
+    transparent
+  );
+}
+html[data-glass="true"] [data-slot="card"] {
+  backdrop-filter: blur(14px) saturate(1.15);
+}
+html[data-bg="dots"] body {
     background-image: radial-gradient(
       color-mix(in oklab, var(--foreground) 18%, transparent) 1px,
       transparent 1px
@@ -232,5 +234,4 @@
     background-size: 24px 24px;
     background-position: 0 0;
     background-repeat: repeat;
-  }
 }
