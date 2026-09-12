@@ -13,7 +13,12 @@ import {
 } from '@/components/ui/sheet'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useApp } from '@/hooks/use-app'
-import type { BgPattern, ThemeMode, ViewMode } from '@/lib/preferences'
+import type {
+  BgPattern,
+  CardStyle,
+  ThemeMode,
+  ViewMode,
+} from '@/lib/preferences'
 import { cn } from '@/lib/utils'
 
 const ACCENTS: { value: string; label: string; color: string }[] = [
@@ -171,6 +176,19 @@ export function SettingsSheet() {
                   <TabsTrigger value="grid">卡片</TabsTrigger>
                   <TabsTrigger value="table">表格</TabsTrigger>
                   <TabsTrigger value="ring">环形</TabsTrigger>
+                </TabsList>
+              </Tabs>
+            </div>
+            <div className="space-y-1">
+              <div className="text-sm text-muted-foreground">卡片样式</div>
+              <Tabs
+                value={prefs.cardStyle}
+                onValueChange={(v) => setPref('cardStyle', v as CardStyle)}
+              >
+                <TabsList className="w-full">
+                  <TabsTrigger value="default">默认</TabsTrigger>
+                  <TabsTrigger value="shine">流光边框</TabsTrigger>
+                  <TabsTrigger value="neon">霓虹渐变</TabsTrigger>
                 </TabsList>
               </Tabs>
             </div>

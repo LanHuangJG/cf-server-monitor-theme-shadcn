@@ -1,6 +1,7 @@
 export type ThemeMode = 'light' | 'dark' | 'system'
 export type ViewMode = 'grid' | 'table' | 'ring'
 export type BgPattern = '' | 'dots' | 'grid'
+export type CardStyle = 'default' | 'shine' | 'neon'
 
 export interface Preferences {
   mode: ThemeMode
@@ -8,6 +9,7 @@ export interface Preferences {
   cardOpacity: number
   bg: string
   bgPattern: BgPattern
+  cardStyle: CardStyle
   view: ViewMode
 }
 
@@ -17,6 +19,7 @@ export const DEFAULT_PREFS: Preferences = {
   cardOpacity: 100,
   bg: '',
   bgPattern: '',
+  cardStyle: 'default',
   view: 'grid',
 }
 
@@ -61,6 +64,13 @@ export function prefsFromThemeOptions(
     options.bgPattern === 'grid'
   ) {
     out.bgPattern = options.bgPattern
+  }
+  if (
+    options.cardStyle === 'default' ||
+    options.cardStyle === 'shine' ||
+    options.cardStyle === 'neon'
+  ) {
+    out.cardStyle = options.cardStyle
   }
   return out
 }

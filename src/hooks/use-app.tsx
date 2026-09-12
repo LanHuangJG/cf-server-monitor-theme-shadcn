@@ -119,6 +119,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       cardOpacity: prefs.cardOpacity,
       bg: prefs.bg,
       bgPattern: prefs.bgPattern,
+      cardStyle: prefs.cardStyle,
     })
   }, [config, prefs])
 

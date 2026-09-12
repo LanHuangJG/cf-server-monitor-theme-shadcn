@@ -6,7 +6,9 @@ import { PingSparkline } from '@/components/ping-sparkline'
 import { RingGauge } from '@/components/ring-gauge'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { NeonGradientCard } from '@/components/ui/neon-gradient-card'
 import { Separator } from '@/components/ui/separator'
+import { ShineBorder } from '@/components/ui/shine-border'
 import {
   formatBytes,
   formatExpiry,
@@ -64,6 +66,7 @@ export function ServerCard({
   showTraffic = true,
   showThreeNet = false,
   variant = 'grid',
+  cardStyle = 'default',
   netNames = { ct: '电信', cu: '联通', cm: '移动', bd: 'BGP' },
 }: {
   server: Server
@@ -72,6 +75,7 @@ export function ServerCard({
   showTraffic?: boolean
   showThreeNet?: boolean
   variant?: 'grid' | 'ring'
+  cardStyle?: 'default' | 'shine' | 'neon'
   netNames?: { ct: string; cu: string; cm: string; bd: string }
 }) {
   const online = isOnline(server)
@@ -103,14 +107,25 @@ export function ServerCard({
 
   const showBilling = showPrice || showExpire
 
-  return (
-    <Link to={`/server/${server.id}`} className="group block">
+  const shine = cardStyle === 'shine'
+  const neon = cardStyle === 'neon'
+
+  const card = (
       <Card
         className={cn(
           'h-full gap-4 py-5 transition-all duration-200 group-hover:-translate-y-0.5 group-hover:border-primary/40 group-hover:shadow-md',
+          shine && 'relative overflow-hidden',
+          neon && 'border-0 shadow-none',
           !online && 'opacity-70'
         )}
       >
+        {shine && (
+          <ShineBorder
+            shineColor={['#A07CFE', '#FE8FB5', '#FFBE7B']}
+            duration={10}
+            borderWidth={1.5}
+          />
+        )}
         <CardHeader className="px-5 pb-0">
           <div className="flex items-start justify-between gap-3">
             <div className="flex min-w-0 items-center gap-2">
@@ -264,6 +279,15 @@ export function ServerCard({
           </div>
         </CardContent>
       </Card>
+  )
+
+  return (
+    <Link to={`/server/${server.id}`} className="group block">
+      {neon ? (
+        <NeonGradientCard className="h-full">{card}</NeonGradientCard>
+      ) : (
+        card
+      )}
     </Link>
   )
 }

@@ -167,6 +167,7 @@ export function Dashboard() {
               key={server.id}
               server={server}
               variant={view === 'ring' ? 'ring' : 'grid'}
+              cardStyle={prefs.cardStyle}
               showPrice={sysConfig?.show_price !== false}
               showExpire={sysConfig?.show_expire !== false}
               showTraffic={sysConfig?.show_tf !== false}
