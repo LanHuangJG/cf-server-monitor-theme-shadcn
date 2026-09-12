@@ -107,10 +107,7 @@ function ServerCardBase({
     { key: 'cu', label: netNames.cu, value: server.ping_cu, loss: server.loss_cu },
     { key: 'cm', label: netNames.cm, value: server.ping_cm, loss: server.loss_cm },
     { key: 'bd', label: netNames.bd, value: server.ping_bd, loss: server.loss_bd },
-  ].filter(
-    (n) => typeof n.value === 'number' || typeof n.loss === 'number'
-  )
-  const hasPing = nets.length > 0
+  ]
   const pingWindow = server.ping || []
 
   const showBilling = showPrice || showExpire
@@ -167,11 +164,11 @@ function ServerCardBase({
                 label="磁盘"
                 sublabel={formatMB(server.disk_used)}
               />
-              {showTraffic && limitBytes && (
+              {showTraffic && (
                 <RingGauge
                   value={trafficPercent}
                   label="流量"
-                  sublabel={formatBytes(usedBytes)}
+                  sublabel={limitBytes ? formatBytes(usedBytes) : '无限'}
                 />
               )}
             </div>
@@ -189,17 +186,21 @@ function ServerCardBase({
                 value={`${formatMB(server.disk_used)} / ${formatMB(server.disk_total)}`}
               />
 
-              {showTraffic && limitBytes && (
+              {showTraffic && (
                 <MetricBar
                   label="流量"
                   percent={trafficPercent}
-                  value={`${formatBytes(usedBytes)} / ${formatBytes(limitBytes)}`}
+                  value={
+                    limitBytes
+                      ? `${formatBytes(usedBytes)} / ${formatBytes(limitBytes)}`
+                      : '无限'
+                  }
                 />
               )}
             </>
           )}
 
-          {showThreeNet && hasPing && (
+          {showThreeNet && (
             <div className="space-y-2">
               <div className="flex gap-1">
                 {nets.map((n) => (
@@ -213,15 +214,17 @@ function ServerCardBase({
                     <div className="text-xs font-medium tabular-nums">
                       {typeof n.value === 'number' ? n.value : '—'}
                     </div>
-                    {typeof n.loss === 'number' && n.loss > 0 && (
-                      <div className="text-[10px] font-medium text-destructive">
-                        {n.loss}%
-                      </div>
-                    )}
+                    <div className="text-[10px] font-medium text-destructive">
+                      {typeof n.loss === 'number' && n.loss > 0
+                        ? `${n.loss}%`
+                        : ''}
+                    </div>
                   </div>
                 ))}
               </div>
-              {pingWindow.length > 1 && <PingSparkline points={pingWindow} />}
+              <div className="h-7">
+                {pingWindow.length > 1 && <PingSparkline points={pingWindow} />}
+              </div>
             </div>
           )}
 
@@ -271,7 +274,7 @@ function ServerCardBase({
             </div>
           )}
 
-          {showValue && remainingValue > 0 && (
+          {showValue && (
             <div className="flex items-center justify-between text-[11px]">
               <span className="text-muted-foreground">剩余价值</span>
               <span className="font-medium tabular-nums">
@@ -280,15 +283,13 @@ function ServerCardBase({
             </div>
           )}
 
-          {tags.length > 0 && (
-            <div className="flex flex-wrap gap-1">
-              {tags.map((tag) => (
-                <Badge key={tag} variant="secondary" className="text-[10px]">
-                  {tag}
-                </Badge>
-              ))}
-            </div>
-          )}
+          <div className="flex min-h-5 flex-wrap gap-1">
+            {tags.map((tag) => (
+              <Badge key={tag} variant="secondary" className="text-[10px]">
+                {tag}
+              </Badge>
+            ))}
+          </div>
 
           <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
             <OsIcon os={server.os} />
@@ -344,7 +345,7 @@ export function ServerCardSkeleton({
             ))}
           </div>
         ) : (
-          [0, 1, 2].map((i) => (
+          [0, 1, 2, 3].map((i) => (
             <div key={i} className="space-y-1.5">
               <div className="flex items-center justify-between">
                 <Skeleton className="h-3 w-10" />
@@ -355,7 +356,25 @@ export function ServerCardSkeleton({
           ))
         )}
 
-        <div className="grid grid-cols-2 gap-x-4 gap-y-2 pt-1">
+        {/* 三网延迟 */}
+        <div className="space-y-2">
+          <div className="flex gap-1">
+            {[0, 1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="flex-1 space-y-1.5 rounded-md bg-muted/50 px-1 py-1.5"
+              >
+                <Skeleton className="mx-auto h-2.5 w-6" />
+                <Skeleton className="mx-auto h-3 w-8" />
+              </div>
+            ))}
+          </div>
+          <Skeleton className="h-7 w-full rounded-md" />
+        </div>
+
+        <div className="border-t" />
+
+        <div className="grid grid-cols-2 gap-x-4 gap-y-2">
           {[0, 1, 2, 3].map((i) => (
             <div key={i} className="flex items-center justify-between">
               <Skeleton className="h-3 w-8" />
@@ -369,7 +388,20 @@ export function ServerCardSkeleton({
           <Skeleton className="h-3 w-14" />
         </div>
 
-        <Skeleton className="h-3 w-32" />
+        <div className="flex items-center justify-between">
+          <Skeleton className="h-3 w-14" />
+          <Skeleton className="h-3 w-12" />
+        </div>
+
+        <div className="flex min-h-5 items-center gap-1">
+          <Skeleton className="h-4 w-12 rounded-md" />
+          <Skeleton className="h-4 w-10 rounded-md" />
+        </div>
+
+        <div className="flex items-center gap-1.5">
+          <Skeleton className="size-3.5 rounded-full" />
+          <Skeleton className="h-3 w-32" />
+        </div>
       </CardContent>
     </Card>
   )
