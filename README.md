@@ -98,6 +98,7 @@ npm run build      # 产物输出到 dist/（index.html + assets/）
 主题会持续维护。觉得好用，点个 Star / 提 issue 反馈就很好；有余力想请我喝杯咖啡也欢迎：
 
 - 爱发电：https://afdian.com/a/wenjings
+- 赞助者名单（自动更新）：[SPONSORS.md](SPONSORS.md)
 
 （主题页头也内置了爱发电按钮，可通过 `theme_options.afdian` 配置。）
 

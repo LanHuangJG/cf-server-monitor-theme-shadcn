@@ -1,0 +1,37 @@
+name: Update sponsors
+
+on:
+  schedule:
+    - cron: '17 4 * * *' # 每天 UTC 04:17
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-sponsors
+  cancel-in-progress: true
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Fetch Afdian sponsors
+        env:
+          AFDIAN_USERID: ${{ secrets.AFDIAN_USERID }}
+          AFDIAN_TOKEN: ${{ secrets.AFDIAN_TOKEN }}
+        run: python3 scripts/fetch-sponsors.py
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add SPONSORS.md
+          if git diff --staged --quiet; then
+            echo "no changes"
+          else
+            git commit -m "chore: update sponsors"
+            git push
+          fi
