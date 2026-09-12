@@ -11,6 +11,8 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
+import { Input } from '@/components/ui/input'
+import { Slider } from '@/components/ui/slider'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useApp } from '@/hooks/use-app'
 import {
@@ -136,14 +138,15 @@ export function SettingsSheet() {
             </Tabs>
             <div className="flex flex-wrap gap-2 pt-1">
               {ACCENTS.map((item) => (
-                <button
+                <Button
                   key={item.value}
                   type="button"
+                  variant="outline"
                   title={item.label}
                   aria-label={item.label}
                   onClick={() => setPref('accent', item.value)}
                   className={cn(
-                    'flex size-7 items-center justify-center rounded-full border',
+                    'size-7 rounded-full',
                     prefs.accent === item.value &&
                       'ring-2 ring-ring ring-offset-1'
                   )}
@@ -155,7 +158,7 @@ export function SettingsSheet() {
                   {prefs.accent === item.value && (
                     <Check className="size-3.5 text-white drop-shadow" />
                   )}
-                </button>
+                </Button>
               ))}
             </div>
           </Section>
@@ -193,18 +196,17 @@ export function SettingsSheet() {
 
             {bgMode === 'image' && (
               <>
-                <input
+                <Input
                   value={bgUrl}
                   onChange={(e) => setBgUrl(e.target.value)}
                   onBlur={commitBg}
                   onKeyDown={(e) => e.key === 'Enter' && commitBg()}
                   placeholder="图片 URL（回车应用）"
-                  className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
                 />
                 <div className="flex items-center gap-2">
                   <label className="cursor-pointer rounded-md border px-3 py-1.5 text-xs hover:bg-accent">
                     本地上传
-                    <input
+                    <Input
                       type="file"
                       accept="image/*"
                       className="hidden"
@@ -236,16 +238,12 @@ export function SettingsSheet() {
                 </span>
                 <span className="tabular-nums">{prefs.cardOpacity}%</span>
               </div>
-              <input
-                type="range"
+              <Slider
                 min={20}
                 max={100}
                 step={5}
-                value={prefs.cardOpacity}
-                onChange={(e) =>
-                  setPref('cardOpacity', Number(e.target.value))
-                }
-                className="w-full"
+                value={[prefs.cardOpacity]}
+                onValueChange={(v) => setPref('cardOpacity', v[0] ?? 100)}
               />
             </div>
             <div className="space-y-1">

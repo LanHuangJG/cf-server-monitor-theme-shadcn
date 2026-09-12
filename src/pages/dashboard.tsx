@@ -9,6 +9,7 @@ import { SettingsSheet } from '@/components/settings-sheet'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { ViewSwitcher, type ViewMode } from '@/components/view-switcher'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useApp } from '@/hooks/use-app'
@@ -129,14 +130,15 @@ export function Dashboard() {
             <div className="flex-1 whitespace-pre-wrap">
               {config.theme_options.announcement}
             </div>
-            <button
-              type="button"
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-6"
               onClick={() => setAnnouncementClosed(true)}
               aria-label="关闭公告"
-              className="text-muted-foreground hover:text-foreground"
             >
               <X className="size-4" />
-            </button>
+            </Button>
           </div>
         )}
 
@@ -184,11 +186,11 @@ export function Dashboard() {
           ) : null}
         </div>
         <div className="flex items-center gap-2">
-          <input
+          <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="搜索节点…"
-            className="h-9 w-40 rounded-lg border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+            className="w-40"
           />
           <ViewSwitcher value={view} onChange={changeView} />
         </div>
