@@ -121,11 +121,13 @@ export function Dashboard() {
           </div>
           <div>
             {config ? (
-              <h1 className="text-lg font-semibold leading-tight">{total}</h1>
+              <h1 className="overlay-text text-lg font-semibold leading-tight">
+                {total}
+              </h1>
             ) : (
               <Skeleton className="h-5 w-40" />
             )}
-            <p className="text-xs text-muted-foreground">
+            <p className="overlay-text text-xs text-muted-foreground">
               由 CF-Server-Monitor 驱动
             </p>
           </div>
@@ -272,7 +274,7 @@ export function Dashboard() {
       )}
 
       {!loading && filtered.length === 0 && !error && (
-        <div className="py-16 text-center text-sm text-muted-foreground">
+        <div className="overlay-text py-16 text-center text-sm text-muted-foreground">
           没有可显示的节点
         </div>
       )}

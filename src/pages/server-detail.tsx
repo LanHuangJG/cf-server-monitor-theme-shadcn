@@ -129,14 +129,14 @@ export function ServerDetail() {
           </Button>
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <h1 className="truncate text-lg font-semibold leading-tight">
+              <h1 className="overlay-text truncate text-lg font-semibold leading-tight">
                 {server.name}
               </h1>
               <Badge variant={online ? 'success' : 'destructive'}>
                 {online ? '在线' : '离线'}
               </Badge>
             </div>
-            <p className="truncate text-xs text-muted-foreground">
+            <p className="overlay-text truncate text-xs text-muted-foreground">
               {server.server_group || '未分组'}
               {server.region ? ` · ${server.region}` : ''}
               {` · 更新于 ${timeAgo(server.last_updated)}`}

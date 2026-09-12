@@ -6,7 +6,7 @@ export function Footer({
   text?: string
 }) {
   return (
-    <footer className="mt-10 border-t py-6 text-center text-xs text-muted-foreground">
+    <footer className="overlay-text mt-10 border-t py-6 text-center text-xs text-muted-foreground">
       {text && <p className="mb-1">{text}</p>}
       <p>
         Powered by{' '}

@@ -74,6 +74,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     []
   )
 
+  // 检测服务端注入的 body 背景图，供「文字描边」用
+  React.useEffect(() => {
+    const bg = window.getComputedStyle(document.body).backgroundImage
+    if (bg && bg !== 'none') document.documentElement.dataset.hasBg = 'true'
+    else delete document.documentElement.dataset.hasBg
+  }, [config])
+
   // 应用到 DOM
   React.useEffect(() => {
     const root = document.documentElement
