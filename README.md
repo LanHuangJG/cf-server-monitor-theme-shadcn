@@ -24,7 +24,7 @@ CF 探针（CF-Server-Monitor）的 **React + shadcn/ui** 主题。社区主题�
 主题**不带自己的设置面板**，外观走 CF-Server-Monitor 官方机制：
 
 - **背景图**：后台「外观设置」的 `custom_bg` / `custom_bg_mobile`（外链需加入 `csp_static` 白名单，上传图转 `data:` 直接可用）。
-- **站点默认**：后台 `theme_options`（`accent` 主色 / `cardStyle` 卡片样式 / `footer` 页脚），主题读取后对全站生效；`cardOpacity` 已不再支持（卡片始终不透明）。
+- **站点默认**：后台 `theme_options`（`accent` 主色 / `cardStyle` 卡片样式 / `footer` 页脚 / `github`、`afdian` 页头社交按钮链接），主题读取后对全站生效；卡片固定 94% 不透明，无透明度滑块。
 - **个人深浅色**：右上角按钮本地切换（`localStorage`，仅影响本机）。
 
 ## 🚀 作为 CF-Server-Monitor 主题使用

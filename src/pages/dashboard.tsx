@@ -5,6 +5,7 @@ import { Footer } from '@/components/footer'
 import { ServerCard, ServerCardSkeleton } from '@/components/server-card'
 import { SummaryBar } from '@/components/summary-bar'
 import { ServerTableLazy } from '@/components/server-table-lazy'
+import { SocialLinks } from '@/components/social-links'
 import { TableSkeleton } from '@/components/table-skeleton'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { ViewSwitcher, type ViewMode } from '@/components/view-switcher'
@@ -134,6 +135,7 @@ export function Dashboard() {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <SocialLinks />
           <Button variant="outline" size="icon" asChild>
             <a href="/admin#admin" aria-label="管理后台" title="管理后台">
               <Settings className="size-4" />
