@@ -59,7 +59,7 @@ const EXPIRY_TONE: Record<string, string> = {
   destructive: 'text-destructive',
 }
 
-export function ServerCard({
+function ServerCardBase({
   server,
   showPrice = true,
   showExpire = true,
@@ -291,3 +291,5 @@ export function ServerCard({
     </Link>
   )
 }
+
+export const ServerCard = React.memo(ServerCardBase)

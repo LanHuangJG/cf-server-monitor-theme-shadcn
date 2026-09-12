@@ -54,6 +54,21 @@ export function Dashboard() {
     return list
   }, [sorted, region, status, query])
 
+  const netNames = React.useMemo(
+    () => ({
+      ct: config?.custom_ct_name || '电信',
+      cu: config?.custom_cu_name || '联通',
+      cm: config?.custom_cm_name || '移动',
+      bd: config?.custom_bd_name || 'BGP',
+    }),
+    [
+      config?.custom_ct_name,
+      config?.custom_cu_name,
+      config?.custom_cm_name,
+      config?.custom_bd_name,
+    ]
+  )
+
   const summary = React.useMemo(() => {
     const online = sorted.filter(isOnline)
     const cpuSum = online.reduce((acc, s) => acc + (s.cpu ?? 0), 0)
@@ -229,12 +244,7 @@ export function Dashboard() {
               showExpire={sysConfig?.show_expire !== false}
               showTraffic={sysConfig?.show_tf !== false}
               showThreeNet={sysConfig?.show_three_net_details !== false}
-              netNames={{
-                ct: config?.custom_ct_name || '电信',
-                cu: config?.custom_cu_name || '联通',
-                cm: config?.custom_cm_name || '移动',
-                bd: config?.custom_bd_name || 'BGP',
-              }}
+              netNames={netNames}
             />
           ))}
         </div>

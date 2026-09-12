@@ -61,6 +61,7 @@ export default function App() {
     <AppProvider>
       <HashRouter>
         <ScrollManager />
+        <div id="cfsm-bg" className="fixed inset-0 -z-10" aria-hidden />
         <div className="min-h-svh">
           <Routes>
             <Route path="/" element={<Dashboard />} />

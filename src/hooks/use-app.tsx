@@ -88,27 +88,33 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
 
     root.style.setProperty('--card-opacity', String(prefs.cardOpacity / 100))
-    if (prefs.cardOpacity < 100) root.dataset.glass = 'true'
-    else delete root.dataset.glass
 
-    const url = prefs.bg.trim()
-    if (url && url !== LOCAL_BG) {
-      root.style.setProperty('--theme-bg-image', `url("${url}")`)
-      delete root.dataset.bg
-    } else if (url === LOCAL_BG) {
+    if (prefs.bgType === 'dots' || prefs.bgType === 'grid') {
+      root.dataset.bg = prefs.bgType
       root.style.removeProperty('--theme-bg-image')
+    } else if (prefs.bgType === 'image') {
       delete root.dataset.bg
+      const url = prefs.bg.trim()
+      if (url && url !== LOCAL_BG) {
+        root.style.setProperty('--theme-bg-image', `url("${url}")`)
+      } else {
+        root.style.removeProperty('--theme-bg-image')
+      }
     } else {
+      delete root.dataset.bg
       root.style.removeProperty('--theme-bg-image')
-      if (prefs.bgPattern) root.dataset.bg = prefs.bgPattern
-      else delete root.dataset.bg
     }
+
+    // 毛玻璃只在有图片背景时才开（backdrop-filter 重，避免拖滑块卡顿）
+    const glass = prefs.cardOpacity < 100 && prefs.bgType === 'image'
+    if (glass) root.dataset.glass = 'true'
+    else delete root.dataset.glass
   }, [prefs])
 
   // 本地图片背景：从 IndexedDB 读取
   React.useEffect(() => {
     let cancelled = false
-    if (prefs.bg !== LOCAL_BG) return
+    if (prefs.bgType !== 'image' || prefs.bg !== LOCAL_BG) return
     loadLocalBg().then((data) => {
       if (!cancelled && data) {
         document.documentElement.style.setProperty(
@@ -120,7 +126,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     return () => {
       cancelled = true
     }
-  }, [prefs.bg])
+  }, [prefs.bg, prefs.bgType])
 
   // 跟随系统模式
   React.useEffect(() => {
@@ -139,7 +145,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       accent: prefs.accent,
       cardOpacity: prefs.cardOpacity,
       bg: prefs.bg === LOCAL_BG ? '' : prefs.bg,
-      bgPattern: prefs.bgPattern,
+      bgType: prefs.bgType,
       cardStyle: prefs.cardStyle,
     })
   }, [config, prefs])

@@ -75,6 +75,7 @@ export function SettingsSheet() {
       await saveLocalBg(dataUrl)
       setLocalPreview(dataUrl)
       setBgUrl('')
+      setPref('bgType', 'image')
       setPref('bg', LOCAL_BG)
       setMessage('已应用本地背景图（仅本机）')
     } catch (err) {
@@ -93,8 +94,6 @@ export function SettingsSheet() {
   const commitBg = () => {
     if (bgUrl.trim() !== prefs.bg) setPref('bg', bgUrl.trim())
   }
-
-  const bgMode = prefs.bg ? 'image' : prefs.bgPattern || 'none'
 
   const onSaveSite = async () => {
     setSaving(true)
@@ -165,16 +164,13 @@ export function SettingsSheet() {
 
           <Section title="背景">
             <Tabs
-              value={bgMode}
+              value={prefs.bgType}
               onValueChange={(v) => {
-                if (v === 'none') {
-                  setPref('bg', '')
-                  setPref('bgPattern', '')
-                } else if (v === 'dots' || v === 'grid') {
-                  setPref('bg', '')
-                  setPref('bgPattern', v)
+                if (v === 'image') {
+                  setPref('bgType', 'image')
                 } else {
-                  setPref('bgPattern', '')
+                  setPref('bg', '')
+                  setPref('bgType', v as 'none' | 'dots' | 'grid')
                 }
               }}
             >
@@ -194,7 +190,7 @@ export function SettingsSheet() {
               </TabsList>
             </Tabs>
 
-            {bgMode === 'image' && (
+            {prefs.bgType === 'image' && (
               <>
                 <Input
                   value={bgUrl}
