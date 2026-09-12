@@ -61,7 +61,7 @@ export default function App() {
     <AppProvider>
       <HashRouter>
         <ScrollManager />
-        <div className="min-h-svh bg-background">
+        <div className="min-h-svh">
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route
