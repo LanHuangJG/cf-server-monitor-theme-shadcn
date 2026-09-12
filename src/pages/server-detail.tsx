@@ -122,7 +122,7 @@ export function ServerDetail() {
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
-      <header className="mb-6 flex items-center justify-between gap-4 rounded-xl border bg-card px-4 py-3 shadow-xs">
+      <header className="mb-6 flex flex-wrap items-center justify-between gap-x-4 gap-y-3 rounded-xl border bg-card px-4 py-3 shadow-xs">
         <div className="flex min-w-0 items-center gap-3">
           <Button variant="outline" size="icon" asChild>
             <Link to="/" aria-label="返回">
@@ -145,7 +145,7 @@ export function ServerDetail() {
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="ml-auto flex items-center gap-2">
           <SocialLinks />
           <Button variant="outline" size="icon" asChild>
             <a href="/admin#admin" aria-label="管理后台" title="管理后台">

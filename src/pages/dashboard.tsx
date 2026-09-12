@@ -111,8 +111,8 @@ export function Dashboard() {
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
-      <header className="mb-6 flex items-center justify-between gap-4 rounded-xl border bg-card px-4 py-3 shadow-xs">
-        <div className="flex items-center gap-3">
+      <header className="mb-6 flex flex-wrap items-center justify-between gap-x-4 gap-y-3 rounded-xl border bg-card px-4 py-3 shadow-xs">
+        <div className="flex min-w-0 items-center gap-3">
           <div className="flex size-10 items-center justify-center rounded-xl bg-primary text-primary-foreground">
             <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <rect x="2" y="3" width="20" height="7" rx="2" />
@@ -121,20 +121,20 @@ export function Dashboard() {
               <circle cx="6.5" cy="17.5" r="1" fill="currentColor" />
             </svg>
           </div>
-          <div>
+          <div className="min-w-0">
             {config ? (
-              <h1 className="text-lg font-semibold leading-tight">
+              <h1 className="truncate text-lg font-semibold leading-tight">
                 {total}
               </h1>
             ) : (
-              <Skeleton className="h-5 w-40" />
+              <Skeleton className="h-5 w-32 sm:w-40" />
             )}
-            <p className="text-xs text-muted-foreground">
+            <p className="truncate text-xs text-muted-foreground">
               React · shadcn/ui 主题
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="ml-auto flex items-center gap-2">
           <SocialLinks />
           <Button variant="outline" size="icon" asChild>
             <a href="/admin#admin" aria-label="管理后台" title="管理后台">

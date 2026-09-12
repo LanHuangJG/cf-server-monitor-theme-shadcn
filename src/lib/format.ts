@@ -22,11 +22,6 @@ export function formatSpeed(bytesPerSec?: number): string {
   return `${value.toFixed(i === 0 ? 0 : 1)} ${units[i]}`
 }
 
-export function formatPercent(value?: number, decimals = 0): string {
-  if (value === undefined || value === null || Number.isNaN(value)) return '-'
-  return `${value.toFixed(decimals)}%`
-}
-
 export function usedPercent(used?: number, total?: number): number {
   if (!used || !total || total <= 0) return 0
   return Math.min(100, Math.max(0, (used / total) * 100))
@@ -139,15 +134,4 @@ export function formatTrafficPercent(percent: number): string {
   if (percent < 0.01) return '<0.01%'
   if (percent < 1) return `${percent.toFixed(2)}%`
   return `${percent.toFixed(1)}%`
-}
-
-export function hasPacketLoss(server: {
-  loss_ct?: number | boolean | null
-  loss_cu?: number | boolean | null
-  loss_cm?: number | boolean | null
-  loss_bd?: number | boolean | null
-}): boolean {
-  return [server.loss_ct, server.loss_cu, server.loss_cm, server.loss_bd].some(
-    (v) => typeof v === 'number' && v > 0
-  )
 }
