@@ -3,9 +3,9 @@ import * as React from 'react'
 
 import { Footer } from '@/components/footer'
 import { ServerCard } from '@/components/server-card'
-import { ServerTable } from '@/components/server-table'
 import { SummaryBar } from '@/components/summary-bar'
-import { SettingsSheet } from '@/components/settings-sheet'
+import { SettingsSheetLazy } from '@/components/settings-sheet-lazy'
+import { ServerTableLazy } from '@/components/server-table-lazy'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { ViewSwitcher, type ViewMode } from '@/components/view-switcher'
 import { Button } from '@/components/ui/button'
@@ -112,7 +112,7 @@ export function Dashboard() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <SettingsSheet />
+          <SettingsSheetLazy />
           <Button variant="outline" size="icon" asChild>
             <a href="/admin#admin" aria-label="管理后台" title="管理后台">
               <Settings className="size-4" />
@@ -225,7 +225,7 @@ export function Dashboard() {
         </div>
       ) : view === 'table' ? (
         <div className="mt-6">
-          <ServerTable
+          <ServerTableLazy
             servers={filtered}
             showPrice={sysConfig?.show_price !== false}
             showExpire={sysConfig?.show_expire !== false}

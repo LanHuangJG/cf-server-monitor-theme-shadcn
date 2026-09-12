@@ -14,7 +14,7 @@ import { DetailSkeleton } from '@/components/detail-skeleton'
 import { Footer } from '@/components/footer'
 import { HistoryChart } from '@/components/history-chart'
 import { MetricBar } from '@/components/metric-bar'
-import { SettingsSheet } from '@/components/settings-sheet'
+import { SettingsSheetLazy } from '@/components/settings-sheet-lazy'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -141,7 +141,7 @@ export function ServerDetail() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <SettingsSheet />
+          <SettingsSheetLazy />
           <Button variant="outline" size="icon" asChild>
             <a href="/admin#admin" aria-label="管理后台" title="管理后台">
               <Settings className="size-4" />
