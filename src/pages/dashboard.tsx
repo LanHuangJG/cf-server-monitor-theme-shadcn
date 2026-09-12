@@ -205,7 +205,7 @@ export function Dashboard() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="搜索节点…"
-            className="w-40"
+            className="w-40 bg-background/60 backdrop-blur"
           />
           <ViewSwitcher value={view} onChange={changeView} />
         </div>

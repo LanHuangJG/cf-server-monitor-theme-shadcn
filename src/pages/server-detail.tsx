@@ -55,6 +55,20 @@ export function ServerDetail() {
     id,
     1
   )
+  const netNames = React.useMemo(
+    () => ({
+      ct: config?.custom_ct_name || '电信',
+      cu: config?.custom_cu_name || '联通',
+      cm: config?.custom_cm_name || '移动',
+      bd: config?.custom_bd_name || 'BGP',
+    }),
+    [
+      config?.custom_ct_name,
+      config?.custom_cu_name,
+      config?.custom_cm_name,
+      config?.custom_bd_name,
+    ]
+  )
 
   if (!id) return null
 
@@ -100,20 +114,6 @@ export function ServerDetail() {
   const from = Math.max(server.timestamp ?? 0, windowStart)
   const outages = computeOutages(history, from)
 
-  const netNames = React.useMemo(
-    () => ({
-      ct: config?.custom_ct_name || '电信',
-      cu: config?.custom_cu_name || '联通',
-      cm: config?.custom_cm_name || '移动',
-      bd: config?.custom_bd_name || 'BGP',
-    }),
-    [
-      config?.custom_ct_name,
-      config?.custom_cu_name,
-      config?.custom_cm_name,
-      config?.custom_bd_name,
-    ]
-  )
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
