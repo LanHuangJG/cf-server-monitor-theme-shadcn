@@ -2,9 +2,10 @@ import { Megaphone, Search, Settings, X } from 'lucide-react'
 import * as React from 'react'
 
 import { Footer } from '@/components/footer'
-import { ServerCard } from '@/components/server-card'
+import { ServerCard, ServerCardSkeleton } from '@/components/server-card'
 import { SummaryBar } from '@/components/summary-bar'
 import { ServerTableLazy } from '@/components/server-table-lazy'
+import { TableSkeleton } from '@/components/table-skeleton'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { ViewSwitcher, type ViewMode } from '@/components/view-switcher'
 import { Button } from '@/components/ui/button'
@@ -239,11 +240,20 @@ export function Dashboard() {
       )}
 
       {loading ? (
-        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <Skeleton key={i} className="h-64 rounded-xl" />
-          ))}
-        </div>
+        view === 'table' ? (
+          <div className="mt-6">
+            <TableSkeleton />
+          </div>
+        ) : (
+          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <ServerCardSkeleton
+                key={i}
+                variant={view === 'ring' ? 'ring' : 'grid'}
+              />
+            ))}
+          </div>
+        )
       ) : view === 'table' ? (
         <div className="mt-6">
           <ServerTableLazy

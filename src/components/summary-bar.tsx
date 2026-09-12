@@ -48,7 +48,18 @@ export function SummaryBar({
   loading?: boolean
 }) {
   if (loading) {
-    return <Skeleton className="h-14 w-full rounded-xl" />
+    return (
+      <Card className="gap-0 py-0">
+        <CardContent className="flex flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3">
+          {['w-16', 'w-32', 'w-32', 'w-20', 'w-16'].map((w, i) => (
+            <div key={i} className="flex items-center gap-2">
+              <Skeleton className="h-3 w-10" />
+              <Skeleton className={cn('h-4', w)} />
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+    )
   }
 
   const offline = Math.max(0, total - online)

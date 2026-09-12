@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { NeonGradientCard } from '@/components/ui/neon-gradient-card'
 import { Separator } from '@/components/ui/separator'
 import { ShineBorder } from '@/components/ui/shine-border'
+import { Skeleton } from '@/components/ui/skeleton'
 import { formatCNY } from '@/lib/finance'
 import {
   formatBytes,
@@ -312,3 +313,64 @@ function ServerCardBase({
 }
 
 export const ServerCard = React.memo(ServerCardBase)
+
+export function ServerCardSkeleton({
+  variant = 'grid',
+}: {
+  variant?: 'grid' | 'ring'
+}) {
+  return (
+    <Card className="h-full gap-4 py-5">
+      <CardHeader className="px-5 pb-0">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-2">
+            <Skeleton className="h-4 w-6 rounded-[2px]" />
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-3 w-16" />
+            </div>
+          </div>
+          <Skeleton className="h-5 w-11 rounded-md" />
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-3 px-5">
+        {variant === 'ring' ? (
+          <div className="flex justify-around gap-1 py-1">
+            {[0, 1, 2, 3].map((i) => (
+              <div key={i} className="flex flex-col items-center gap-1.5">
+                <Skeleton className="size-14 rounded-full" />
+                <Skeleton className="h-3 w-8" />
+              </div>
+            ))}
+          </div>
+        ) : (
+          [0, 1, 2].map((i) => (
+            <div key={i} className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <Skeleton className="h-3 w-10" />
+                <Skeleton className="h-3 w-20" />
+              </div>
+              <Skeleton className="h-1.5 w-full rounded-full" />
+            </div>
+          ))
+        )}
+
+        <div className="grid grid-cols-2 gap-x-4 gap-y-2 pt-1">
+          {[0, 1, 2, 3].map((i) => (
+            <div key={i} className="flex items-center justify-between">
+              <Skeleton className="h-3 w-8" />
+              <Skeleton className="h-3 w-12" />
+            </div>
+          ))}
+        </div>
+
+        <div className="flex items-center justify-between">
+          <Skeleton className="h-3 w-16" />
+          <Skeleton className="h-3 w-14" />
+        </div>
+
+        <Skeleton className="h-3 w-32" />
+      </CardContent>
+    </Card>
+  )
+}
