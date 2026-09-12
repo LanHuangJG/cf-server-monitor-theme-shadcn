@@ -129,7 +129,7 @@ export function Dashboard() {
               <Skeleton className="h-5 w-40" />
             )}
             <p className="text-xs text-muted-foreground">
-              由 CF-Server-Monitor 驱动
+              React · shadcn/ui 主题
             </p>
           </div>
         </div>

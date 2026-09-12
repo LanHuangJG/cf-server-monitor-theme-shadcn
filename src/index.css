@@ -194,6 +194,11 @@
   }
 }
 
+/* 卡片轻微透明（固定 94%），透出一点背景又保证文字可读 */
+[data-slot='card'] {
+  background-color: color-mix(in oklab, var(--card) 94%, transparent);
+}
+
 /* 预留滚动条位置：弹层锁滚动（如外观下拉）时不会因滚动条消失导致页面宽度跳变 */
 html {
   scrollbar-gutter: stable;
